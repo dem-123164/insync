@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InSync</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 420px;
+    }
+
+    h1 {
+      font-size: 52px;
+      margin-bottom: 5px;
+    }
+
+    .slogan {
+      color: #94a3b8;
+      font-size: 18px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 30px 20px;
+      border-radius: 20px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+    }
+
+    .card p {
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      padding: 16px;
+      margin-top: 15px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #22c55e;
+      color: white;
+    }
+
+    .secondary {
+      background: #334155;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>InSync</h1>
+    <div class="slogan">Aynı frekansta buluş.</div>
+
+    <div class="card">
+      <h2>Sana benzeyen insanları keşfet</h2>
+
+      <p>
+        Dinlediğin müzikler, okuduğun kitaplar,
+        izlediğin filmler ve öğrendiğin diller
+        üzerinden ortak noktalarını bul.
+      </p>
+
+      <button class="primary"
+        onclick="alert('InSync eşleşme sistemi yakında burada!')">
+        Eşleşmeye Başla
+      </button>
+
+      <button class="secondary"
+        onclick="alert('Dil partneri bölümü yakında burada!')">
+        Dil Partneri Bul
+      </button>
+    </div>
+
+  </div>
+
+</body>
+</html>
