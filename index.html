@@ -749,7 +749,28 @@ function closeMyProfile() {
     document.getElementById("app").style.display = "block";
     window.scrollTo(0, 0);
 }
-    
+function editProfile() {
+    const newName = prompt("Adın:", "Kullanıcı");
+
+    if (newName && newName.trim() !== "") {
+        document.querySelector("#myProfile .profile-name").textContent = newName;
+    }
+
+    const newUsername = prompt("Kullanıcı adın:", "@kullanici");
+
+    if (newUsername && newUsername.trim() !== "") {
+        document.querySelector("#myProfile .profile-user").textContent = newUsername;
+    }
+
+    const newBio = prompt(
+        "Kısa biyografin:",
+        "InSync'te yeni insanlarla tanışıyor, öğreniyor ve paylaşıyorum."
+    );
+
+    if (newBio && newBio.trim() !== "") {
+        document.querySelector("#myProfile .bio").textContent = newBio;
+    }
+}    
 </script>
 
 </body>
