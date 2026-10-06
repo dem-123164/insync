@@ -6,558 +6,468 @@
 <title>InSync App</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
 }
 
 .screen {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 25px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 25px;
 }
 
 .container {
-    width: 100%;
-    max-width: 430px;
+  width: 100%;
+  max-width: 430px;
 }
 
 h1 {
-    font-size: 52px;
-    margin: 0 0 5px;
+  font-size: 52px;
+  margin: 0 0 5px;
 }
 
 h2 {
-    font-size: 27px;
-    margin: 0 0 10px;
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 
-.slogan {
-    color: #cbd5e1;
-    font-size: 17px;
-    margin-bottom: 38px;
+.subtitle {
+  color: #94a3b8;
+  margin-bottom: 30px;
+  line-height: 1.5;
 }
 
 .card {
-    background: #1e293b;
-    padding: 28px 20px;
-    border-radius: 22px;
-    box-shadow: 0 15px 40px rgba(0,0,0,.25);
-}
-
-.card p {
-    color: #cbd5e1;
-    line-height: 1.5;
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 22px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.25);
 }
 
 button {
-    width: 100%;
-    border: none;
-    padding: 16px;
-    margin-top: 12px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    color: white;
-    background: #334155;
+  width: 100%;
+  border: 0;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-.primary { background: #22c55e; }
+.primary {
+  background: #4ade80;
+  color: #052e16;
+}
+
+.secondary {
+  background: #334155;
+  color: white;
+}
 
 .interests {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 25px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 20px 0;
 }
 
 .interest {
-    background: #334155;
-    border: 2px solid transparent;
-    padding: 20px 8px;
-    border-radius: 14px;
-    cursor: pointer;
+  background: #334155;
+  border: 2px solid transparent;
+  padding: 18px 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .interest.selected {
-    border-color: #22c55e;
-    background: #173c2a;
-}
-
-.icon {
-    font-size: 23px;
-    display: block;
-    margin-bottom: 5px;
+  border-color: #4ade80;
+  background: #163a2a;
 }
 
 .small {
-    color: #94a3b8;
-    font-size: 14px;
-    margin-top: 15px;
-}
-
-#interestScreen,
-#profileScreen,
-#matchesScreen {
-    display: none;
-}
-
-.score {
-    width: 145px;
-    height: 145px;
-    border-radius: 50%;
-    border: 9px solid #22c55e;
-    margin: 25px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.score strong { font-size: 42px; }
-
-.score span {
-    color: #94a3b8;
-    font-size: 13px;
+  color: #94a3b8;
+  font-size: 13px;
 }
 
 .level {
-    display: inline-block;
-    background: #173c2a;
-    color: #4ade80;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    margin-bottom: 15px;
+  color: #bbf7d0;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
-.profile-info {
-    text-align: left;
-    background: #162033;
-    padding: 18px;
-    border-radius: 14px;
-    margin-top: 15px;
+.score {
+  width: 145px;
+  height: 145px;
+  margin: 20px auto;
+  border: 8px solid #4ade80;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.profile-info div {
-    padding: 9px 0;
-    border-bottom: 1px solid #334155;
+.score strong {
+  font-size: 38px;
 }
 
-.profile-info div:last-child {
-    border-bottom: none;
+.score span {
+  font-size: 12px;
+  color: #cbd5e1;
 }
 
-/* 4. EKRAN */
+.stats {
+  text-align: left;
+  margin: 20px 0;
+}
 
-.match-list {
-    margin-top: 25px;
+.stat {
+  padding: 11px 0;
+  border-bottom: 1px solid #334155;
 }
 
 .person {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 15px;
-    text-align: left;
+  text-align: left;
+  background: #263548;
+  border-radius: 16px;
+  padding: 17px;
+  margin: 12px 0;
 }
 
 .person-top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.avatar {
-    width: 58px;
-    height: 58px;
-    min-width: 58px;
-    border-radius: 50%;
-    background: #334155;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 27px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .person-name {
-    font-size: 19px;
-    font-weight: bold;
+  font-size: 20px;
+  font-weight: bold;
 }
 
-.match-percent {
-    color: #4ade80;
-    font-weight: bold;
-    margin-top: 4px;
+.match {
+  color: #4ade80;
+  font-weight: bold;
 }
 
 .tags {
-    margin-top: 14px;
+  margin-top: 10px;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.tag {
-    display: inline-block;
-    background: #162033;
-    color: #cbd5e1;
-    padding: 7px 10px;
-    border-radius: 15px;
-    font-size: 12px;
-    margin: 3px;
-}
-
-.reason {
-    color: #94a3b8;
-    font-size: 13px;
-    margin-top: 12px;
-    line-height: 1.4;
-}
-
-.person button {
-    padding: 11px;
-    font-size: 14px;
-}
-
-.section-subtitle {
-    color: #94a3b8;
-    line-height: 1.5;
+#interestsScreen,
+#profileScreen,
+#matchesScreen {
+  display: none;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 1. EKRAN -->
 <section id="homeScreen" class="screen">
-<div class="container">
+  <div class="container">
 
     <h1>InSync</h1>
-    <div class="slogan">Aynı frekansta buluş.</div>
+    <div class="subtitle">Aynı frekansta buluş.</div>
 
     <div class="card">
-        <h2>Sana benzeyen insanları keşfet</h2>
+      <h2>Sana benzeyen insanları keşfet</h2>
 
-        <p>
-            Dinlediğin müzikler, okuduğun kitaplar,
-            izlediğin filmler ve öğrendiğin diller üzerinden
-            ortak noktalarını bul.
-        </p>
+      <p class="subtitle">
+        Dinlediğin müzikler, okuduğun kitaplar,
+        izlediğin filmler ve öğrendiğin diller
+        üzerinden ortak noktalarını bul.
+      </p>
 
-        <button class="primary" onclick="showInterests()">
-            Eşleşmeye Başla
-        </button>
+      <button class="primary" onclick="showInterests()">
+        Eşleşmeye Başla
+      </button>
 
-        <button onclick="showInterests()">
-            Dil Partneri Bul
-        </button>
+      <button class="secondary" onclick="showInterests()">
+        Dil Partneri Bul
+      </button>
     </div>
 
-</div>
+  </div>
 </section>
 
 
-<!-- 2. EKRAN -->
-<section id="interestScreen" class="screen">
-<div class="container">
+<section id="interestsScreen" class="screen">
+  <div class="container">
 
     <h2>Seni neler anlatıyor?</h2>
 
-    <p class="section-subtitle">
-        İlgi alanlarını seç. InSync ortak noktalarınıza göre
-        sana daha uyumlu insanları gösterecek.
+    <p class="subtitle">
+      İlgi alanlarını seç. InSync ortak noktalarınıza göre
+      sana daha uyumlu insanları gösterecek.
     </p>
 
     <div class="interests">
 
-        <div class="interest" onclick="toggleInterest(this)">
-            <span class="icon">🎵</span>
-            Müzik
-        </div>
+      <div class="interest" onclick="toggleInterest(this)">
+        🎵<br>Müzik
+      </div>
 
-        <div class="interest" onclick="toggleInterest(this)">
-            <span class="icon">📚</span>
-            Kitap & Edebiyat
-        </div>
+      <div class="interest" onclick="toggleInterest(this)">
+        📚<br>Kitap & Edebiyat
+      </div>
 
-        <div class="interest" onclick="toggleInterest(this)">
-            <span class="icon">💬</span>
-            Felsefe
-        </div>
+      <div class="interest" onclick="toggleInterest(this)">
+        💬<br>Felsefe
+      </div>
 
-        <div class="interest" onclick="toggleInterest(this)">
-            <span class="icon">🎬</span>
-            Sinema
-        </div>
+      <div class="interest" onclick="toggleInterest(this)">
+        🎬<br>Sinema
+      </div>
 
-        <div class="interest" onclick="toggleInterest(this)">
-            <span class="icon">🌐</span>
-            Dil Pratiği
-        </div>
+      <div class="interest" onclick="toggleInterest(this)">
+        🌐<br>Dil Pratiği
+      </div>
 
-        <div class="interest" onclick="toggleInterest(this)">
-            <span class="icon">🍳</span>
-            Yemek & Mutfak
-        </div>
+      <div class="interest" onclick="toggleInterest(this)">
+        🍳<br>Yemek & Mutfak
+      </div>
 
     </div>
 
-    <div class="small">
-        Birden fazla alan seçebilirsin.
-    </div>
+    <p class="small">Birden fazla alan seçebilirsin.</p>
 
     <button class="primary" onclick="continueMatch()">
-        Devam Et
+      Devam Et
     </button>
 
-    <button onclick="goHome()">
-        Geri Dön
+    <button class="secondary" onclick="goHome()">
+      Geri Dön
     </button>
 
-</div>
+  </div>
 </section>
 
 
-<!-- 3. EKRAN -->
 <section id="profileScreen" class="screen">
-<div class="container">
+  <div class="container">
 
     <h2>Uyum Profilin Hazır</h2>
 
-    <p class="section-subtitle">
-        Seçimlerine göre InSync profilinin ilk seviyesi oluşturuldu.
+    <p class="subtitle">
+      Seçimlerine göre InSync profilinin ilk seviyesi oluşturuldu.
     </p>
 
     <div class="card">
 
-        <div class="level">
-            Seviye 1 • Keşif
+      <div class="level">Seviye 1 • Keşif</div>
+
+      <div class="score">
+        <strong id="scoreNumber">78%</strong>
+        <span>Uyum Potansiyeli</span>
+      </div>
+
+      <p>
+        Ortak ilgi alanların arttıkça ve toplulukta
+        etkileşim kurdukça uyum seviyen gelişecek.
+      </p>
+
+      <div class="stats">
+
+        <div class="stat">
+          🎯 İlgi alanı:
+          <strong id="interestCount">0</strong>
         </div>
 
-        <div class="score">
-            <strong id="scoreNumber">72%</strong>
-            <span>Uyum Potansiyeli</span>
+        <div class="stat">
+          🟢 Uyum Seviyesi: <strong>Başlangıç</strong>
         </div>
 
-        <p>
-            Ortak ilgi alanların arttıkça ve toplulukta
-            etkileşim kurdukça uyum seviyen gelişecek.
-        </p>
-
-        <div class="profile-info">
-
-            <div>
-                🎯 İlgi alanı:
-                <strong id="interestCount">0</strong>
-            </div>
-
-            <div>
-                🤝 Uyum Seviyesi:
-                <strong>Başlangıç</strong>
-            </div>
-
-            <div>
-                ⭐ Profil Seviyesi:
-                <strong>Keşif</strong>
-            </div>
-
-            <div>
-                💬 Sonraki adım:
-                <strong>Topluluğu keşfet</strong>
-            </div>
-
+        <div class="stat">
+          ⭐ Profil Seviyesi: <strong>Keşif</strong>
         </div>
 
-        <button class="primary" onclick="showMatches()">
-            Bana Uygun İnsanları Göster
-        </button>
+        <div class="stat">
+          💬 Sonraki adım: <strong>Topluluğu keşfet</strong>
+        </div>
 
-        <button onclick="backToInterests()">
-            İlgi Alanlarını Değiştir
-        </button>
+      </div>
+
+      <button class="primary" onclick="showMatches()">
+        Bana Uygun İnsanları Göster
+      </button>
+
+      <button class="secondary" onclick="backToInterests()">
+        İlgi Alanlarını Değiştir
+      </button>
 
     </div>
-
-</div>
+  </div>
 </section>
 
 
-<!-- 4. EKRAN -->
 <section id="matchesScreen" class="screen">
-<div class="container">
+  <div class="container">
 
-    <h2>Sana Uygun Kişiler</h2>
+    <h2>Seninle Aynı Frekansta</h2>
 
-    <p class="section-subtitle">
-        Ortak ilgi alanlarına göre ilk eşleşmelerin.
+    <p class="subtitle">
+      Ortak ilgi alanlarına göre öne çıkan kişiler.
     </p>
 
-    <div class="match-list">
+    <div class="person">
+      <div class="person-top">
+        <span class="person-name">Deniz</span>
+        <span class="match">92% uyum</span>
+      </div>
 
-        <div class="person">
+      <div class="tags">
+        🎵 Alternatif müzik • 📚 Edebiyat • 💬 Felsefe
+      </div>
 
-            <div class="person-top">
-                <div class="avatar">A</div>
-
-                <div>
-                    <div class="person-name">Ayşe</div>
-                    <div class="match-percent">%91 Uyum</div>
-                </div>
-            </div>
-
-            <div class="tags">
-                <span class="tag">🎵 Müzik</span>
-                <span class="tag">💬 Felsefe</span>
-                <span class="tag">🌐 Almanca</span>
-            </div>
-
-            <div class="reason">
-                Benzer müziklerden hoşlanıyor ve Almanca pratiği yapmak istiyor.
-            </div>
-
-            <button class="primary" onclick="openProfile('Ayşe')">
-                Profili Gör
-            </button>
-
-        </div>
-
-
-        <div class="person">
-
-            <div class="person-top">
-                <div class="avatar">M</div>
-
-                <div>
-                    <div class="person-name">Mert</div>
-                    <div class="match-percent">%86 Uyum</div>
-                </div>
-            </div>
-
-            <div class="tags">
-                <span class="tag">📚 Edebiyat</span>
-                <span class="tag">💬 Felsefe</span>
-                <span class="tag">🎬 Sinema</span>
-            </div>
-
-            <div class="reason">
-                Felsefe, edebiyat ve sinema üzerine sohbet etmeyi seviyor.
-            </div>
-
-            <button class="primary" onclick="openProfile('Mert')">
-                Profili Gör
-            </button>
-
-        </div>
-
-
-        <div class="person">
-
-            <div class="person-top">
-                <div class="avatar">E</div>
-
-                <div>
-                    <div class="person-name">Elif</div>
-                    <div class="match-percent">%82 Uyum</div>
-                </div>
-            </div>
-
-            <div class="tags">
-                <span class="tag">🎵 Müzik</span>
-                <span class="tag">🍳 Mutfak</span>
-                <span class="tag">📚 Kitap</span>
-            </div>
-
-            <div class="reason">
-                Yeni müzikler, kitaplar ve farklı mutfaklar keşfetmeyi seviyor.
-            </div>
-
-            <button class="primary" onclick="openProfile('Elif')">
-                Profili Gör
-            </button>
-
-        </div>
-
+      <button class="primary" onclick="openProfile('Deniz')">
+        Profili Gör
+      </button>
     </div>
 
-    <button onclick="backToProfile()">
-        Uyum Profilime Dön
+    <div class="person">
+      <div class="person-top">
+        <span class="person-name">Elif</span>
+        <span class="match">87% uyum</span>
+      </div>
+
+      <div class="tags">
+        📚 Kitaplar • 🎬 Sinema • 🌐 Dil pratiği
+      </div>
+
+      <button class="primary" onclick="openProfile('Elif')">
+        Profili Gör
+      </button>
+    </div>
+
+    <div class="person">
+      <div class="person-top">
+        <span class="person-name">Mert</span>
+        <span class="match">83% uyum</span>
+      </div>
+
+      <div class="tags">
+        🎵 Müzik • 💬 Felsefe • 🍳 Mutfak
+      </div>
+
+      <button class="primary" onclick="openProfile('Mert')">
+        Profili Gör
+      </button>
+    </div>
+
+    <button class="secondary" onclick="backToProfile()">
+      Uyum Profilime Dön
     </button>
 
-</div>
+  </div>
 </section>
 
 
 <script>
 
+function hideAll() {
+  document.getElementById("homeScreen").style.display = "none";
+  document.getElementById("interestsScreen").style.display = "none";
+  document.getElementById("profileScreen").style.display = "none";
+  document.getElementById("matchesScreen").style.display = "none";
+}
+
 function showInterests() {
-    document.getElementById("homeScreen").style.display = "none";
-    document.getElementById("interestScreen").style.display = "flex";
+  hideAll();
+  document.getElementById("interestsScreen").style.display = "flex";
+  window.scrollTo(0,0);
 }
 
 function goHome() {
-    document.getElementById("interestScreen").style.display = "none";
-    document.getElementById("homeScreen").style.display = "flex";
+  hideAll();
+  document.getElementById("homeScreen").style.display = "flex";
 }
 
 function toggleInterest(element) {
-    element.classList.toggle("selected");
+  element.classList.toggle("selected");
 }
 
 function continueMatch() {
 
-    const selected =
-        document.querySelectorAll(".interest.selected");
+  const selected =
+    document.querySelectorAll(".interest.selected");
 
-    if (selected.length === 0) {
-        alert("Devam etmek için en az bir ilgi alanı seç.");
-        return;
-    }
+  if (selected.length === 0) {
+    alert("Devam etmek için en az bir ilgi alanı seç.");
+    return;
+  }
 
-    document.getElementById("interestCount").textContent =
-        selected.length;
+  document.getElementById("interestCount").textContent =
+    selected.length;
 
-    let score = 60 + (selected.length * 6);
+  let score = 66 + (selected.length * 4);
 
-    if (score > 96) {
-        score = 96;
-    }
+  if (score > 96) {
+    score = 96;
+  }
 
-    document.getElementById("scoreNumber").textContent =
-        score + "%";
+  document.getElementById("scoreNumber").textContent =
+    score + "%";
 
-    document.getElementById("interestScreen").style.display = "none";
-    document.getElementById("profileScreen").style.display = "flex";
+  hideAll();
+
+  document.getElementById("profileScreen").style.display =
+    "flex";
+
+  window.scrollTo(0,0);
 }
 
 function backToInterests() {
-    document.getElementById("profileScreen").style.display = "none";
-    document.getElementById("interestScreen").style.display = "flex";
+  hideAll();
+
+  document.getElementById("interestsScreen").style.display =
+    "flex";
+
+  window.scrollTo(0,0);
 }
 
 function showMatches() {
-    document.getElementById("profileScreen").style.display = "none";
-    document.getElementById("matchesScreen").style.display = "flex";
-    window.scrollTo(0,0);
+
+  hideAll();
+
+  document.getElementById("matchesScreen").style.display =
+    "flex";
+
+  window.scrollTo(0,0);
 }
 
 function backToProfile() {
-    document.getElementById("matchesScreen").style.display = "none";
-    document.getElementById("profileScreen").style.display = "flex";
-    window.scrollTo(0,0);
+
+  hideAll();
+
+  document.getElementById("profileScreen").style.display =
+    "flex";
+
+  window.scrollTo(0,0);
 }
 
 function openProfile(name) {
-    alert(
-        name +
-        " profilini seçtin. Bir sonraki aşamada kişinin ayrıntılı profilini ve iletişim seçeneklerini açacağız."
-    );
+
+  alert(
+    name +
+    " profilini seçtin. Bir sonraki aşamada ayrıntılı profil ve mesajlaşma ekranını ekleyeceğiz."
+  );
+
 }
 
 </script>
