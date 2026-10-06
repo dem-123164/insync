@@ -840,6 +840,12 @@ function saveProfile() {
 
     if (name) {
         document.querySelector("#myProfile .profile-name").textContent = name;
+
+        // Avatarı adın ilk harfi yap
+        const avatar = document.querySelector("#myProfile .big-avatar");
+        if (avatar) {
+            avatar.textContent = name.charAt(0).toUpperCase();
+        }
     }
 
     if (username) {
@@ -851,11 +857,45 @@ function saveProfile() {
         document.querySelector("#myProfile .bio").textContent = bio;
     }
 
+    // Bilgileri tarayıcıda sakla
+    localStorage.setItem("insyncName", name);
+    localStorage.setItem("insyncUsername", username);
+    localStorage.setItem("insyncBio", bio);
+
     document.getElementById("editProfilePage").style.display = "none";
     document.getElementById("myProfile").style.display = "block";
     window.scrollTo(0, 0);
 }
-  
+
+    function loadProfile() {
+    const name = localStorage.getItem("insyncName");
+    const username = localStorage.getItem("insyncUsername");
+    const bio = localStorage.getItem("insyncBio");
+
+    if (name) {
+        document.querySelector("#myProfile .profile-name").textContent = name;
+
+        const avatar = document.querySelector("#myProfile .big-avatar");
+        if (avatar) {
+            avatar.textContent = name.charAt(0).toUpperCase();
+        }
+
+        document.getElementById("editName").value = name;
+    }
+
+    if (username) {
+        document.querySelector("#myProfile .profile-user").textContent =
+            "@" + username.replace("@", "");
+        document.getElementById("editUsername").value = username.replace("@", "");
+    }
+
+    if (bio) {
+        document.querySelector("#myProfile .bio").textContent = bio;
+        document.getElementById("editBio").value = bio;
+    }
+}
+
+window.addEventListener("DOMContentLoaded", loadProfile);
 function closeRoom() {
     document.getElementById("roomPage").style.display = "none";
     document.getElementById("profile").style.display = "block";
