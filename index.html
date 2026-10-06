@@ -230,6 +230,11 @@ nav {
     padding: 8px 13px;
     font-size: 14px;
 }
+    .search-item {
+    padding: 16px 4px;
+    border-bottom: 1px solid #eeeeee;
+    cursor: pointer;
+}
 
 .level-box {
     margin-top: 10px;
@@ -621,6 +626,55 @@ nav {
     </div>
 
 </div>
+<!-- ARAMA EKRANI -->
+
+<div id="searchPage" style="display:none; max-width:620px; margin:0 auto; min-height:100vh; background:white; border-left:1px solid #eee; border-right:1px solid #eee;">
+
+    <div style="height:60px; display:flex; align-items:center; border-bottom:1px solid #eee; padding:0 18px;">
+        <span onclick="goHome()" style="font-size:27px; cursor:pointer; margin-right:20px;">‹</span>
+        <strong>Ara</strong>
+    </div>
+
+    <div style="padding:18px;">
+
+        <input id="searchInput"
+               type="text"
+               placeholder="Kişi, ilgi alanı veya oda ara..."
+               oninput="searchInSync()"
+               style="width:100%; padding:13px 16px; border:1px solid #ddd; border-radius:22px; outline:none; font-size:15px;">
+
+        <div id="searchResults" style="margin-top:20px;">
+
+            <div class="search-item" data-search="deniz almanca a1 dil">
+                <strong>Deniz</strong>
+                <div style="color:#777; margin-top:4px;">🇩🇪 Almanca A1 · Felsefe · Müzik</div>
+            </div>
+
+            <div class="search-item" data-search="a1 almanca pratigi dil sohbet">
+                <strong>🇩🇪 A1 Almanca Pratiği</strong>
+                <div style="color:#777; margin-top:4px;">8 kişi · Sohbet odası</div>
+            </div>
+
+            <div class="search-item" data-search="elif felsefe edebiyat">
+                <strong>Elif</strong>
+                <div style="color:#777; margin-top:4px;">Felsefe · Edebiyat</div>
+            </div>
+
+            <div class="search-item" data-search="felsefe sohbetleri">
+                <strong>Felsefe Sohbetleri</strong>
+                <div style="color:#777; margin-top:4px;">12 kişi · Sohbet odası</div>
+            </div>
+
+            <div class="search-item" data-search="mert muzik gitar teori">
+                <strong>Mert</strong>
+                <div style="color:#777; margin-top:4px;">🎵 Müzik · Gitar · Müzik teorisi</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 <script>
 
 function openApp() {
@@ -778,9 +832,42 @@ function goHome() {
     document.getElementById("roomPage").style.display = "none";
     document.getElementById("createPostPage").style.display = "none";
     document.getElementById("myProfile").style.display = "none";
+    document.getElementById("searchPage").style.display = "none";
     window.scrollTo(0, 0);
 }
+}
 function openSearch() {
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("roomPage").style.display = "none";
+    document.getElementById("createPostPage").style.display = "none";
+    document.getElementById("myProfile").style.display = "none";
+    document.getElementById("searchPage").style.display = "block";
+
+    document.getElementById("searchInput").value = "";
+    searchInSync();
+
+    window.scrollTo(0, 0);
+}
+
+function searchInSync() {
+    const text =
+        document.getElementById("searchInput").value.toLowerCase();
+
+    const items =
+        document.querySelectorAll(".search-item");
+
+    items.forEach(function(item) {
+        const words = item.getAttribute("data-search").toLowerCase();
+
+        if (words.includes(text)) {
+            item.style.display = "block";
+        } else {
+            item.style.display = "none";
+        }
+    });
+}
     document.getElementById("splash").style.display = "none";
     document.getElementById("app").style.display = "none";
     document.getElementById("profile").style.display = "none";
