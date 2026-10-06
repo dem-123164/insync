@@ -306,7 +306,7 @@ nav {
 
     <div class="content">
 
-        <div class="username">elif</div>
+<div class="username" onclick="openElifProfile()">elif</div>
 
         <div class="text">
             Felsefe üzerine sohbet etmek isteyenlerle küçük bir grup kurmak istiyorum.
@@ -475,7 +475,68 @@ nav {
 
 </div>
 
-<!-- A1 ALMANCA SOHBET ODASI -->
+<!-- ELİF PROFİLİ -->
+
+<div id="elifProfile" style="display:none; max-width:620px; margin:0 auto; min-height:100vh; background:white;">
+
+    <div class="profile-header">
+        <span class="back" onclick="closeElifProfile()">‹</span>
+        <span class="profile-title">Profil</span>
+    </div>
+
+    <div class="profile-main">
+
+        <div class="profile-top">
+
+            <div>
+                <div class="profile-name">Elif</div>
+                <div class="profile-user">@elif</div>
+            </div>
+
+            <div class="big-avatar">E</div>
+
+        </div>
+
+        <div class="bio">
+            Felsefe, sosyoloji ve derin sohbetlerle ilgileniyorum.
+        </div>
+
+        <div class="section">
+            <div class="section-title">İLGİ ALANLARI</div>
+
+            <div class="tags">
+                <span class="tag">Felsefe</span>
+                <span class="tag">Sosyoloji</span>
+                <span class="tag">Edebiyat</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">INSYNC SEVİYESİ</div>
+
+            <div class="level-box">
+                <div class="level-name">Seviye 2 · Katılımcı</div>
+
+                <div class="level-description">
+                    Sohbetlere katılıyor, fikirlerini paylaşıyor ve topluluğa katkıda bulunuyor.
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">AKTİF SOHBETLER</div>
+
+            <div class="room">
+                <div class="room-title">Felsefe Sohbetleri</div>
+                <div class="room-info">12 kişi · Bugün aktif</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+    <!-- A1 ALMANCA SOHBET ODASI -->
 
 <div id="roomPage" style="display:none; max-width:620px; margin:0 auto; min-height:100vh; background:white; border-left:1px solid #eee; border-right:1px solid #eee;">
 
@@ -888,6 +949,20 @@ function openMyProfile() {
 
 function closeMyProfile() {
     document.getElementById("myProfile").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    window.scrollTo(0, 0);
+}
+    function openElifProfile() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("myProfile").style.display = "none";
+    document.getElementById("roomPage").style.display = "none";
+    document.getElementById("elifProfile").style.display = "block";
+    window.scrollTo(0, 0);
+}
+
+function closeElifProfile() {
+    document.getElementById("elifProfile").style.display = "none";
     document.getElementById("app").style.display = "block";
     window.scrollTo(0, 0);
 }
