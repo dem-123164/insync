@@ -720,7 +720,24 @@ function openRoom() {
     document.getElementById("roomPage").style.display = "block";
     window.scrollTo(0,0);
 }
+function editProfile() {
+    const name = prompt("Adınız:");
+    const username = prompt("Kullanıcı adınız:");
+    const bio = prompt("Kendinizi kısaca anlatın:");
 
+    if (name) {
+        document.getElementById("profileName").textContent = name;
+    }
+
+    if (username) {
+        document.getElementById("profileUsername").textContent =
+            "@" + username.replace("@", "");
+    }
+
+    if (bio) {
+        document.getElementById("profileBio").textContent = bio;
+    }
+}
 function closeRoom() {
     document.getElementById("roomPage").style.display = "none";
     document.getElementById("profile").style.display = "block";
