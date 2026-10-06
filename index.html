@@ -280,6 +280,47 @@ button {
     <button class="secondary" onclick="showMatches()">
       Uyumlu Kişileri Gör
     </button>
+<div class="bottom-nav">
+  <button onclick="showFeed()">🏠 Ana Akış</button>
+  <button onclick="showRooms()">💬 Odalar</button>
+  <button onclick="showMyProfile()">👤 Profil</button>
+</div>
+  </div>
+</section>
+  <!-- ODALAR EKRANI -->
+<section id="roomsScreen" class="screen" style="display:none;">
+  <div class="container">
+
+    <h2>Odalar</h2>
+    <p class="subtitle">İlgini çeken sohbete katıl.</p>
+
+    <div class="card">
+      <h3>🇩🇪 Almanca A1 Pratik</h3>
+      <p>Yeni başlayanlar için Almanca sohbet.</p>
+      <button class="primary">Odaya Katıl</button>
+    </div>
+
+    <div class="card">
+      <h3>🎵 Müzik</h3>
+      <p>Şarkılar, albümler ve müzik üzerine sohbet.</p>
+      <button class="primary">Odaya Katıl</button>
+    </div>
+
+    <div class="card">
+      <h3>💭 Felsefe</h3>
+      <p>Fikirler, sorular ve farklı bakış açıları.</p>
+      <button class="primary">Odaya Katıl</button>
+    </div>
+
+    <div class="card">
+      <h3>🍳 Yemek & Tarifler</h3>
+      <p>Tariflerini paylaş, yeni lezzetler keşfet.</p>
+      <button class="primary">Odaya Katıl</button>
+    </div>
+
+    <button class="secondary" onclick="showFeed()">
+      Ana Akışa Dön
+    </button>
 
   </div>
 </section>
@@ -554,6 +595,7 @@ function hideAll() {
   document.getElementById("profileScreen").style.display = "none";
   document.getElementById("matchesScreen").style.display = "none";
   document.getElementById("feedScreen").style.display = "none";
+  document.getElementById("roomsScreen").style.display = "none";
 }
 
 function showInterests() {
@@ -803,6 +845,11 @@ function addComment(button) {
   list.appendChild(comment);
   input.value = "";
 }  
+  function showRooms() {
+  hideAll();
+  document.getElementById("roomsScreen").style.display = "flex";
+  window.scrollTo(0, 0);
+}
 </script>
 </body>
 </html>
