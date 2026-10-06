@@ -305,9 +305,25 @@ button {
     Paylaş
   </button>
 </div>
-    <div class="feed-box">
+   <div class="feed-box">
+
+  <div style="display:flex; gap:12px; align-items:flex-start;">
+
+    <div onclick="openProfile('Deniz')"
+         style="width:42px; height:42px; border-radius:50%;
+                background:#334155; display:flex;
+                align-items:center; justify-content:center;
+                font-weight:bold; cursor:pointer;">
+      D
+    </div>
+
+    <div style="flex:1;">
+
       <div>
-        <span class="feed-user">Deniz</span>
+        <span class="feed-user"
+              onclick="openProfile('Deniz')"
+              style="cursor:pointer;">Deniz</span>
+
         <span class="feed-match">%92 uyum</span>
       </div>
 
@@ -316,12 +332,12 @@ button {
       </div>
 
       <div class="feed-actions">
-      <span onclick="likePost(this)" style="cursor:pointer;">♡ 24</span>
-       <span onclick="toggleComments(this)" style="cursor:pointer;">💬 8 yorum</span>
+        <span onclick="likePost(this)" style="cursor:pointer;">♡ 24</span>
+        <span onclick="toggleComments(this)" style="cursor:pointer;">💬 8 yorum</span>
       </div>
 
-     
     </div>
+  </div>
 
     <div class="feed-box">
       <div>
