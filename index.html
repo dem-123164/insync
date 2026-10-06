@@ -377,7 +377,71 @@ button {
   </div>
 </section>
 
+<!-- DENİZ PROFİLİ -->
+<section id="denizProfile" class="screen" style="display:none;">
+  <div class="container">
+    <h2>Deniz</h2>
+    <p class="subtitle">%92 Uyum</p>
 
+    <div class="card">
+      <h3>Deniz'in Profili</h3>
+      <p>🎵 Alternatif Müzik &nbsp; • &nbsp; 📚 Edebiyat &nbsp; • &nbsp; 💭 Felsefe</p>
+      <p>Müzik, edebiyat ve felsefe üzerine derin sohbetlerden hoşlanıyor.</p>
+
+      <button class="primary" onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
+        Mesaj Gönder
+      </button>
+
+      <button class="secondary" onclick="closePersonProfile()">
+        Geri Dön
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ELİF PROFİLİ -->
+<section id="elifProfile" class="screen" style="display:none;">
+  <div class="container">
+    <h2>Elif</h2>
+    <p class="subtitle">%87 Uyum</p>
+
+    <div class="card">
+      <h3>Elif'in Profili</h3>
+      <p>📚 Kitaplar &nbsp; • &nbsp; 🎬 Sinema &nbsp; • &nbsp; 🌐 Dil Pratiği</p>
+      <p>Kitaplar, sinema ve yabancı dil pratiğiyle ilgileniyor.</p>
+
+      <button class="primary" onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
+        Mesaj Gönder
+      </button>
+
+      <button class="secondary" onclick="closePersonProfile()">
+        Geri Dön
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- MERT PROFİLİ -->
+<section id="mertProfile" class="screen" style="display:none;">
+  <div class="container">
+    <h2>Mert</h2>
+    <p class="subtitle">%83 Uyum</p>
+
+    <div class="card">
+      <h3>Mert'in Profili</h3>
+      <p>🎵 Müzik &nbsp; • &nbsp; 💭 Felsefe &nbsp; • &nbsp; 🍳 Mutfak</p>
+      <p>Müzik, felsefe ve farklı mutfaklar üzerine sohbet etmeyi seviyor.</p>
+
+      <button class="primary" onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
+        Mesaj Gönder
+      </button>
+
+      <button class="secondary" onclick="closePersonProfile()">
+        Geri Dön
+      </button>
+    </div>
+  </div>
+</section>
 <script>
 
 function hideAll() {
@@ -462,14 +526,24 @@ function backToProfile() {
 }
 
 function openProfile(name) {
+    hideAll();
 
-  alert(
-    name +
-    " profilini seçtin. Bir sonraki aşamada ayrıntılı profil ve mesajlaşma ekranını ekleyeceğiz."
-  );
+    if (name === "Deniz") {
+        document.getElementById("denizProfile").style.display = "flex";
+    } else if (name === "Elif") {
+        document.getElementById("elifProfile").style.display = "flex";
+    } else if (name === "Mert") {
+        document.getElementById("mertProfile").style.display = "flex";
+    }
 
+    window.scrollTo(0, 0);
 }
 
+function closePersonProfile() {
+    hideAll();
+    document.getElementById("matchesScreen").style.display = "flex";
+    window.scrollTo(0, 0);
+}
 </script>
 <!-- AYŞE PROFİL EKRANI -->
 <section id="ayseProfile" class="screen" style="display:none;">
