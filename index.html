@@ -531,6 +531,34 @@ nav {
     </div>
 
 </div>
+    <!-- YENİ PAYLAŞIM EKRANI -->
+
+<div id="createPostPage" style="display:none; max-width:620px; margin:0 auto; min-height:100vh; background:white; border-left:1px solid #eee; border-right:1px solid #eee;">
+
+    <div style="height:60px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding:0 18px;">
+
+        <span onclick="closeCreatePost()" style="font-size:27px; cursor:pointer;">‹</span>
+
+        <strong>Yeni paylaşım</strong>
+
+        <button onclick="publishPost()"
+                style="border:none; background:black; color:white; border-radius:20px; padding:9px 16px; cursor:pointer;">
+            Paylaş
+        </button>
+
+    </div>
+
+    <div style="display:flex; padding:20px;">
+
+        <div class="avatar">S</div>
+
+        <textarea id="postInput"
+                  placeholder="Ne paylaşmak istiyorsun?"
+                  style="flex:1; min-height:150px; border:none; outline:none; resize:none; font-family:Arial; font-size:16px; padding:10px;"></textarea>
+
+    </div>
+
+</div>
 <script>
 
 function openApp() {
@@ -597,6 +625,53 @@ function sendMessage() {
             behavior: "smooth"
         });
     }
+}
+function openCreatePost() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("roomPage").style.display = "none";
+    document.getElementById("createPostPage").style.display = "block";
+    window.scrollTo(0, 0);
+}
+
+function closeCreatePost() {
+    document.getElementById("createPostPage").style.display = "none";
+    document.getElementById("app").style.display = "block";
+}
+
+function publishPost() {
+    const input = document.getElementById("postInput");
+
+    if (input.value.trim() === "") return;
+
+    const newPost = document.createElement("div");
+    newPost.className = "post";
+
+    newPost.innerHTML = `
+        <div class="avatar">S</div>
+
+        <div class="content">
+            <div class="username">sen</div>
+
+            <div class="text">${input.value}</div>
+
+            <div class="actions">
+                <span class="action">♡</span>
+                <span class="action">○</span>
+                <span class="action">↗</span>
+            </div>
+        </div>
+    `;
+
+    const firstPost = document.querySelector("#app .post");
+    firstPost.parentNode.insertBefore(newPost, firstPost);
+
+    input.value = "";
+
+    document.getElementById("createPostPage").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    window.scrollTo(0, 0);
 }
 </script>
 
