@@ -754,7 +754,8 @@ function closeAyseProfile() {
 
   if (element.dataset.liked === "true") {
     element.textContent = "♡ " + (number - 1);
-    element.dataset.liked = "fals  } else {
+  element.dataset.liked = "false";
+} else {
     element.textContent = "♥ " + (number + 1);
     element.dataset.liked = "true";
   }
