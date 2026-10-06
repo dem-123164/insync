@@ -304,7 +304,7 @@ nav {
 
         <div class="actions">
            <span class="action" onclick="toggleLike(this)">♡</span>
-            <span class="action">○</span>
+           <span class="action" onclick="addComment(this)">○</span>
             <span class="action">↗</span>
         </div>
 
@@ -327,7 +327,7 @@ nav {
 
         <div class="actions">
             <span class="action" onclick="toggleLike(this)">♡</span>
-            <span class="action">○</span>
+          <span class="action" onclick="addComment(this)">○</span>
             <span class="action">↗</span>
         </div>
 
@@ -350,7 +350,7 @@ nav {
 
         <div class="actions">
            <span class="action" onclick="toggleLike(this)">♡</span>
-            <span class="action">○</span>
+          <span class="action" onclick="addComment(this)">○</span>
             <span class="action">↗</span>
         </div>
 
@@ -875,6 +875,28 @@ function toggleLike(element) {
         element.textContent = "♡";
     }
 }  
+function addComment(element) {
+    const comment = prompt("Yorumunu yaz:");
+
+    if (comment && comment.trim() !== "") {
+        const post = element.closest(".post");
+
+        const newComment = document.createElement("div");
+        newComment.style.marginTop = "12px";
+        newComment.style.fontSize = "14px";
+
+        const name = document.createElement("strong");
+        name.textContent = "Sen: ";
+
+        const text = document.createElement("span");
+        text.textContent = comment;
+
+        newComment.appendChild(name);
+        newComment.appendChild(text);
+
+        post.querySelector(".content").appendChild(newComment);
+    }
+}
 </script>
 
 </body>
