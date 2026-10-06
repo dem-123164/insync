@@ -6,9 +6,7 @@
 <title>InSync App</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -38,7 +36,7 @@ h1 {
 
 h2 {
     font-size: 27px;
-    margin-bottom: 10px;
+    margin: 0 0 10px;
 }
 
 .slogan {
@@ -72,9 +70,7 @@ button {
     background: #334155;
 }
 
-.primary {
-    background: #22c55e;
-}
+.primary { background: #22c55e; }
 
 .interests {
     display: grid;
@@ -89,11 +85,6 @@ button {
     padding: 20px 8px;
     border-radius: 14px;
     cursor: pointer;
-    transition: .2s;
-}
-
-.interest:hover {
-    background: #3f4d61;
 }
 
 .interest.selected {
@@ -114,7 +105,8 @@ button {
 }
 
 #interestScreen,
-#profileScreen {
+#profileScreen,
+#matchesScreen {
     display: none;
 }
 
@@ -130,9 +122,7 @@ button {
     flex-direction: column;
 }
 
-.score strong {
-    font-size: 42px;
-}
+.score strong { font-size: 42px; }
 
 .score span {
     color: #94a3b8;
@@ -165,6 +155,81 @@ button {
 .profile-info div:last-child {
     border-bottom: none;
 }
+
+/* 4. EKRAN */
+
+.match-list {
+    margin-top: 25px;
+}
+
+.person {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.person-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.avatar {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 27px;
+}
+
+.person-name {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.match-percent {
+    color: #4ade80;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.tags {
+    margin-top: 14px;
+}
+
+.tag {
+    display: inline-block;
+    background: #162033;
+    color: #cbd5e1;
+    padding: 7px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin: 3px;
+}
+
+.reason {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-top: 12px;
+    line-height: 1.4;
+}
+
+.person button {
+    padding: 11px;
+    font-size: 14px;
+}
+
+.section-subtitle {
+    color: #94a3b8;
+    line-height: 1.5;
+}
 </style>
 </head>
 
@@ -172,155 +237,260 @@ button {
 
 <!-- 1. EKRAN -->
 <section id="homeScreen" class="screen">
-    <div class="container">
+<div class="container">
 
-        <h1>InSync</h1>
-        <div class="slogan">Aynı frekansta buluş.</div>
+    <h1>InSync</h1>
+    <div class="slogan">Aynı frekansta buluş.</div>
 
-        <div class="card">
-            <h2>Sana benzeyen insanları keşfet</h2>
+    <div class="card">
+        <h2>Sana benzeyen insanları keşfet</h2>
 
-            <p>
-                Dinlediğin müzikler, okuduğun kitaplar,
-                izlediğin filmler ve öğrendiğin diller üzerinden
-                ortak noktalarını bul.
-            </p>
+        <p>
+            Dinlediğin müzikler, okuduğun kitaplar,
+            izlediğin filmler ve öğrendiğin diller üzerinden
+            ortak noktalarını bul.
+        </p>
 
-            <button class="primary" onclick="showInterests()">
-                Eşleşmeye Başla
-            </button>
+        <button class="primary" onclick="showInterests()">
+            Eşleşmeye Başla
+        </button>
 
-            <button onclick="showInterests()">
-                Dil Partneri Bul
-            </button>
-        </div>
-
+        <button onclick="showInterests()">
+            Dil Partneri Bul
+        </button>
     </div>
+
+</div>
 </section>
 
 
 <!-- 2. EKRAN -->
 <section id="interestScreen" class="screen">
-    <div class="container">
+<div class="container">
 
-        <h2>Seni neler anlatıyor?</h2>
+    <h2>Seni neler anlatıyor?</h2>
 
-        <p>
-            İlgi alanlarını seç. InSync ortak noktalarınıza göre
-            sana daha uyumlu insanları gösterecek.
-        </p>
+    <p class="section-subtitle">
+        İlgi alanlarını seç. InSync ortak noktalarınıza göre
+        sana daha uyumlu insanları gösterecek.
+    </p>
 
-        <div class="interests">
+    <div class="interests">
 
-            <div class="interest" onclick="toggleInterest(this)">
-                <span class="icon">🎵</span>
-                Müzik
-            </div>
-
-            <div class="interest" onclick="toggleInterest(this)">
-                <span class="icon">📚</span>
-                Kitap & Edebiyat
-            </div>
-
-            <div class="interest" onclick="toggleInterest(this)">
-                <span class="icon">💬</span>
-                Felsefe
-            </div>
-
-            <div class="interest" onclick="toggleInterest(this)">
-                <span class="icon">🎬</span>
-                Sinema
-            </div>
-
-            <div class="interest" onclick="toggleInterest(this)">
-                <span class="icon">🌐</span>
-                Dil Pratiği
-            </div>
-
-            <div class="interest" onclick="toggleInterest(this)">
-                <span class="icon">🍳</span>
-                Yemek & Mutfak
-            </div>
-
+        <div class="interest" onclick="toggleInterest(this)">
+            <span class="icon">🎵</span>
+            Müzik
         </div>
 
-        <div class="small">
-            Birden fazla alan seçebilirsin.
+        <div class="interest" onclick="toggleInterest(this)">
+            <span class="icon">📚</span>
+            Kitap & Edebiyat
         </div>
 
-        <button class="primary" onclick="continueMatch()">
-            Devam Et
-        </button>
+        <div class="interest" onclick="toggleInterest(this)">
+            <span class="icon">💬</span>
+            Felsefe
+        </div>
 
-        <button onclick="goHome()">
-            Geri Dön
-        </button>
+        <div class="interest" onclick="toggleInterest(this)">
+            <span class="icon">🎬</span>
+            Sinema
+        </div>
+
+        <div class="interest" onclick="toggleInterest(this)">
+            <span class="icon">🌐</span>
+            Dil Pratiği
+        </div>
+
+        <div class="interest" onclick="toggleInterest(this)">
+            <span class="icon">🍳</span>
+            Yemek & Mutfak
+        </div>
 
     </div>
+
+    <div class="small">
+        Birden fazla alan seçebilirsin.
+    </div>
+
+    <button class="primary" onclick="continueMatch()">
+        Devam Et
+    </button>
+
+    <button onclick="goHome()">
+        Geri Dön
+    </button>
+
+</div>
 </section>
 
 
 <!-- 3. EKRAN -->
 <section id="profileScreen" class="screen">
-    <div class="container">
+<div class="container">
 
-        <h2>Uyum Profilin Hazır</h2>
+    <h2>Uyum Profilin Hazır</h2>
+
+    <p class="section-subtitle">
+        Seçimlerine göre InSync profilinin ilk seviyesi oluşturuldu.
+    </p>
+
+    <div class="card">
+
+        <div class="level">
+            Seviye 1 • Keşif
+        </div>
+
+        <div class="score">
+            <strong id="scoreNumber">72%</strong>
+            <span>Uyum Potansiyeli</span>
+        </div>
 
         <p>
-            Seçimlerine göre InSync profilinin ilk seviyesi oluşturuldu.
+            Ortak ilgi alanların arttıkça ve toplulukta
+            etkileşim kurdukça uyum seviyen gelişecek.
         </p>
 
-        <div class="card">
+        <div class="profile-info">
 
-            <div class="level">
-                Seviye 1 • Keşif
+            <div>
+                🎯 İlgi alanı:
+                <strong id="interestCount">0</strong>
             </div>
 
-            <div class="score">
-                <strong id="scoreNumber">72%</strong>
-                <span>Uyum Potansiyeli</span>
+            <div>
+                🤝 Uyum Seviyesi:
+                <strong>Başlangıç</strong>
             </div>
 
-            <p>
-                Ortak ilgi alanların arttıkça ve toplulukta
-                etkileşim kurdukça uyum seviyen gelişecek.
-            </p>
-
-            <div class="profile-info">
-
-                <div>
-                    🎯 İlgi alanı:
-                    <strong id="interestCount">0</strong>
-                </div>
-
-                <div>
-                    🤝 Uyum Seviyesi:
-                    <strong>Başlangıç</strong>
-                </div>
-
-                <div>
-                    ⭐ Profil Seviyesi:
-                    <strong>Keşif</strong>
-                </div>
-
-                <div>
-                    💬 Sonraki adım:
-                    <strong>Topluluğu keşfet</strong>
-                </div>
-
+            <div>
+                ⭐ Profil Seviyesi:
+                <strong>Keşif</strong>
             </div>
 
-            <button class="primary" onclick="discover()">
-                Bana Uygun İnsanları Göster
+            <div>
+                💬 Sonraki adım:
+                <strong>Topluluğu keşfet</strong>
+            </div>
+
+        </div>
+
+        <button class="primary" onclick="showMatches()">
+            Bana Uygun İnsanları Göster
+        </button>
+
+        <button onclick="backToInterests()">
+            İlgi Alanlarını Değiştir
+        </button>
+
+    </div>
+
+</div>
+</section>
+
+
+<!-- 4. EKRAN -->
+<section id="matchesScreen" class="screen">
+<div class="container">
+
+    <h2>Sana Uygun Kişiler</h2>
+
+    <p class="section-subtitle">
+        Ortak ilgi alanlarına göre ilk eşleşmelerin.
+    </p>
+
+    <div class="match-list">
+
+        <div class="person">
+
+            <div class="person-top">
+                <div class="avatar">A</div>
+
+                <div>
+                    <div class="person-name">Ayşe</div>
+                    <div class="match-percent">%91 Uyum</div>
+                </div>
+            </div>
+
+            <div class="tags">
+                <span class="tag">🎵 Müzik</span>
+                <span class="tag">💬 Felsefe</span>
+                <span class="tag">🌐 Almanca</span>
+            </div>
+
+            <div class="reason">
+                Benzer müziklerden hoşlanıyor ve Almanca pratiği yapmak istiyor.
+            </div>
+
+            <button class="primary" onclick="openProfile('Ayşe')">
+                Profili Gör
             </button>
 
-            <button onclick="backToInterests()">
-                İlgi Alanlarını Değiştir
+        </div>
+
+
+        <div class="person">
+
+            <div class="person-top">
+                <div class="avatar">M</div>
+
+                <div>
+                    <div class="person-name">Mert</div>
+                    <div class="match-percent">%86 Uyum</div>
+                </div>
+            </div>
+
+            <div class="tags">
+                <span class="tag">📚 Edebiyat</span>
+                <span class="tag">💬 Felsefe</span>
+                <span class="tag">🎬 Sinema</span>
+            </div>
+
+            <div class="reason">
+                Felsefe, edebiyat ve sinema üzerine sohbet etmeyi seviyor.
+            </div>
+
+            <button class="primary" onclick="openProfile('Mert')">
+                Profili Gör
+            </button>
+
+        </div>
+
+
+        <div class="person">
+
+            <div class="person-top">
+                <div class="avatar">E</div>
+
+                <div>
+                    <div class="person-name">Elif</div>
+                    <div class="match-percent">%82 Uyum</div>
+                </div>
+            </div>
+
+            <div class="tags">
+                <span class="tag">🎵 Müzik</span>
+                <span class="tag">🍳 Mutfak</span>
+                <span class="tag">📚 Kitap</span>
+            </div>
+
+            <div class="reason">
+                Yeni müzikler, kitaplar ve farklı mutfaklar keşfetmeyi seviyor.
+            </div>
+
+            <button class="primary" onclick="openProfile('Elif')">
+                Profili Gör
             </button>
 
         </div>
 
     </div>
+
+    <button onclick="backToProfile()">
+        Uyum Profilime Dön
+    </button>
+
+</div>
 </section>
 
 
@@ -371,9 +541,22 @@ function backToInterests() {
     document.getElementById("interestScreen").style.display = "flex";
 }
 
-function discover() {
+function showMatches() {
+    document.getElementById("profileScreen").style.display = "none";
+    document.getElementById("matchesScreen").style.display = "flex";
+    window.scrollTo(0,0);
+}
+
+function backToProfile() {
+    document.getElementById("matchesScreen").style.display = "none";
+    document.getElementById("profileScreen").style.display = "flex";
+    window.scrollTo(0,0);
+}
+
+function openProfile(name) {
     alert(
-        "Harika! Bir sonraki aşamada sana uygun insanların profillerini oluşturacağız."
+        name +
+        " profilini seçtin. Bir sonraki aşamada kişinin ayrıntılı profilini ve iletişim seçeneklerini açacağız."
     );
 }
 
