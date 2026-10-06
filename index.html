@@ -174,11 +174,121 @@ button {
 #matchesScreen {
   display: none;
 }
+  /* ANA AKIŞ */
+
+#feedScreen {
+  display: none;
+}
+
+.feed-header {
+  margin-bottom: 20px;
+}
+
+.feed-box {
+  background: #1e293b;
+  padding: 18px;
+  border-radius: 18px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.feed-user {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.feed-match {
+  color: #4ade80;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.feed-text {
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+.feed-actions {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+.feed-room {
+  margin-top: 12px;
+  background: #4ade80;
+  color: #0f172a;
+}
 </style>
 </head>
 
 <body>
+<!-- ORTAK ALAN / ANA AKIŞ -->
+<section id="feedScreen" class="screen">
+  <div class="container">
 
+    <div class="feed-header">
+      <h2>InSync</h2>
+      <p class="subtitle">Paylaş, keşfet, sohbete katıl.</p>
+    </div>
+<div class="feed-box">
+  <textarea id="postInput"
+    placeholder="Bir şey paylaş..."
+    style="width:100%; min-height:80px; padding:12px; border-radius:12px; border:none; resize:none;"></textarea>
+
+  <button class="primary" onclick="addPost()">
+    Paylaş
+  </button>
+</div>
+    <div class="feed-box">
+      <div>
+        <span class="feed-user">Deniz</span>
+        <span class="feed-match">%92 uyum</span>
+      </div>
+
+      <div class="feed-text">
+        Bugün Almanca A1 pratiği yapmak isteyen var mı?
+      </div>
+
+      <div class="feed-actions">
+        <span>♡ 24</span>
+        <span>💬 8 yorum</span>
+      </div>
+
+      <button class="feed-room"
+        onclick="alert('Almanca A1 odasını birazdan bağlayacağız.')">
+        🇩🇪 Almanca A1 Odasına Katıl
+      </button>
+    </div>
+
+    <div class="feed-box">
+      <div>
+        <span class="feed-user">Elif</span>
+        <span class="feed-match">%87 uyum</span>
+      </div>
+
+      <div class="feed-text">
+        English practice tonight? A1 seviyesinde sohbet edebiliriz.
+      </div>
+
+      <div class="feed-actions">
+        <span>♡ 18</span>
+        <span>💬 5 yorum</span>
+      </div>
+
+      <button class="feed-room"
+        onclick="alert('İngilizce A1 odasını birazdan bağlayacağız.')">
+        🇬🇧 İngilizce A1 Odasına Katıl
+      </button>
+    </div>
+
+    <button class="secondary" onclick="showMatches()">
+      Uyumlu Kişileri Gör
+    </button>
+
+  </div>
+</section>
 <section id="homeScreen" class="screen">
   <div class="container">
 
@@ -303,9 +413,9 @@ button {
 
       </div>
 
-      <button class="primary" onclick="showMatches()">
-        Bana Uygun İnsanları Göster
-      </button>
+      <button class="primary" onclick="showFeed()">
+  Ana Akışa Geç
+</button>
 
       <button class="secondary" onclick="backToInterests()">
         İlgi Alanlarını Değiştir
@@ -449,6 +559,7 @@ function hideAll() {
   document.getElementById("interestsScreen").style.display = "none";
   document.getElementById("profileScreen").style.display = "none";
   document.getElementById("matchesScreen").style.display = "none";
+  document.getElementById("feedScreen").style.display = "none";
 }
 
 function showInterests() {
@@ -597,6 +708,46 @@ function closeAyseProfile() {
   hideAll();
   document.getElementById("matchesScreen").style.display = "flex";
   window.scrollTo(0,0);
+}
+  function addPost() {
+  const input = document.getElementById("postInput");
+  const text = input.value.trim();
+
+  if (text === "") {
+    alert("Önce bir şey yazmalısın.");
+    return;
+  }
+
+  const post = document.createElement("div");
+  post.className = "feed-box";
+
+  post.innerHTML = `
+    <div>
+      <span class="feed-user">Sen</span>
+    </div>
+
+    <div class="feed-text">${text}</div>
+
+    <div class="feed-actions">
+      <span>♡ 0</span>
+      <span>💬 0 yorum</span>
+    </div>
+  `;
+
+  const feed = document.getElementById("feedScreen")
+    .querySelector(".container");
+
+  const composer = document.getElementById("postInput")
+    .closest(".feed-box");
+
+  composer.insertAdjacentElement("afterend", post);
+
+  input.value = "";
+}
+  function showFeed() {
+  hideAll();
+  document.getElementById("feedScreen").style.display = "flex";
+  window.scrollTo(0, 0);
 }
 </script>
 </body>
