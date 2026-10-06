@@ -650,7 +650,7 @@ nav {
                 <div style="color:#777; margin-top:4px;">🇩🇪 Almanca A1 · Felsefe · Müzik</div>
             </div>
 
-            <div class="search-item" data-search="a1 almanca pratigi dil sohbet">
+          <div class="search-item" data-search="a1 almanca pratigi dil sohbet" onclick="openRoom()" style="cursor:pointer;">
                 <strong>🇩🇪 A1 Almanca Pratiği</strong>
                 <div style="color:#777; margin-top:4px;">8 kişi · Sohbet odası</div>
             </div>
@@ -703,6 +703,7 @@ function closeProfile() {
 }
 function openRoom() {
     document.getElementById("profile").style.display = "none";
+    document.getElementById("searchPage").style.display = "none";
     document.getElementById("roomPage").style.display = "block";
     window.scrollTo(0,0);
 }
