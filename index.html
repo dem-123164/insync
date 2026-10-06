@@ -471,6 +471,59 @@ function openProfile(name) {
 }
 
 </script>
+<!-- AYŞE PROFİL EKRANI -->
+<section id="ayseProfile" class="screen" style="display:none;">
+  <div class="container">
 
+    <h2>Ayşe</h2>
+    <div style="color:#4ade80; font-size:22px; font-weight:bold; margin-bottom:20px;">
+      %91 Uyum
+    </div>
+
+    <div class="card">
+      <div style="font-size:60px; margin-bottom:15px;">A</div>
+
+      <h3>Ayşe</h3>
+
+      <p style="color:#4ade80; font-weight:bold;">
+        %91 Uyum
+      </p>
+
+      <p>
+        🎵 Müzik &nbsp;&nbsp;
+        💬 Felsefe &nbsp;&nbsp;
+        🌐 Almanca
+      </p>
+
+      <p>
+        Benzer müziklerden hoşlanıyor. Felsefe üzerine sohbet etmeyi
+        ve Almanca pratik yapmayı seviyor.
+      </p>
+
+      <button onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
+        Mesaj Gönder
+      </button>
+
+      <button class="secondary" onclick="closeAyseProfile()">
+        Geri Dön
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<script>
+function openAyseProfile() {
+  hideAll();
+  document.getElementById("ayseProfile").style.display = "flex";
+  window.scrollTo(0,0);
+}
+
+function closeAyseProfile() {
+  hideAll();
+  document.getElementById("matchesScreen").style.display = "flex";
+  window.scrollTo(0,0);
+}
+</script>
 </body>
 </html>
