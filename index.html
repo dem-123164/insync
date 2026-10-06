@@ -359,7 +359,7 @@ nav {
     <span>⌕</span>
   <span onclick="openCreatePost()" style="cursor:pointer;">＋</span>
     <span>♡</span>
-    <span>◎</span>
+  <span onclick="openMyProfile()" style="cursor:pointer;">◎</span>
 </nav>
 
 </div>
@@ -671,6 +671,11 @@ function publishPost() {
     document.getElementById("createPostPage").style.display = "none";
     document.getElementById("app").style.display = "block";
 
+    window.scrollTo(0, 0);
+}
+function openMyProfile() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "block";
     window.scrollTo(0, 0);
 }
 </script>
