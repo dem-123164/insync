@@ -1,83 +1,125 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InSync App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InSync App</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  min-height: 100vh;
+}
 
-    .container {
-      width: 90%;
-      max-width: 420px;
-    }
+.screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 25px;
+}
 
-    h1 {
-      font-size: 52px;
-      margin-bottom: 5px;
-    }
+.container {
+  width: 100%;
+  max-width: 430px;
+}
 
-    .slogan {
-      color: #94a3b8;
-      font-size: 18px;
-      margin-bottom: 40px;
-    }
+h1 {
+  font-size: 52px;
+  margin: 0 0 5px;
+}
 
-    .card {
-      background: #1e293b;
-      padding: 30px 20px;
-      border-radius: 20px;
-    }
+.slogan {
+  color: #94a3b8;
+  font-size: 18px;
+  margin-bottom: 40px;
+}
 
-    .card h2 {
-      margin-top: 0;
-    }
+.card {
+  background: #1e293b;
+  padding: 30px 20px;
+  border-radius: 20px;
+}
 
-    .card p {
-      color: #cbd5e1;
-      line-height: 1.5;
-    }
+.card h2 {
+  margin-top: 0;
+}
 
-    button {
-      width: 100%;
-      border: none;
-      padding: 16px;
-      margin-top: 15px;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.description {
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
 
-    .primary {
-      background: #22c55e;
-      color: white;
-    }
+button {
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
 
-    .secondary {
-      background: #334155;
-      color: white;
-    }
-  </style>
+.primary {
+  background: #22c55e;
+  color: white;
+}
+
+.secondary {
+  background: #334155;
+  color: white;
+}
+
+#interestsScreen {
+  display: none;
+}
+
+.interests {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+.interest {
+  background: #334155;
+  border: 2px solid transparent;
+  padding: 18px 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.interest:hover {
+  background: #475569;
+}
+
+.interest.selected {
+  border-color: #22c55e;
+  background: #14532d;
+}
+
+.small {
+  color: #94a3b8;
+  font-size: 14px;
+}
+</style>
 </head>
 
 <body>
 
+<!-- ANA EKRAN -->
+<section id="homeScreen" class="screen">
   <div class="container">
 
     <h1>InSync</h1>
@@ -86,24 +128,111 @@
     <div class="card">
       <h2>Sana benzeyen insanları keşfet</h2>
 
-      <p>
+      <p class="description">
         Dinlediğin müzikler, okuduğun kitaplar,
-        izlediğin filmler ve öğrendiğin diller
-        üzerinden ortak noktalarını bul.
+        izlediğin filmler ve öğrendiğin diller üzerinden
+        ortak noktalarını bul.
       </p>
 
-      <button class="primary"
-        onclick="alert('InSync eşleşme sistemi yakında burada!')">
+      <button class="primary" onclick="showInterests()">
         Eşleşmeye Başla
       </button>
 
-      <button class="secondary"
-        onclick="alert('Dil partneri bölümü yakında burada!')">
+      <button class="secondary">
         Dil Partneri Bul
       </button>
     </div>
 
   </div>
+</section>
+
+
+<!-- İLGİ ALANLARI EKRANI -->
+<section id="interestsScreen" class="screen">
+
+  <div class="container">
+
+    <h2>Seni neler anlatıyor?</h2>
+
+    <p class="description">
+      İlgi alanlarını seç. InSync ortak noktalarınıza göre
+      sana daha uyumlu insanları gösterecek.
+    </p>
+
+    <div class="interests">
+
+      <div class="interest" onclick="toggleInterest(this)">
+        🎵<br>Müzik
+      </div>
+
+      <div class="interest" onclick="toggleInterest(this)">
+        📚<br>Kitap & Edebiyat
+      </div>
+
+      <div class="interest" onclick="toggleInterest(this)">
+        💭<br>Felsefe
+      </div>
+
+      <div class="interest" onclick="toggleInterest(this)">
+        🎬<br>Sinema
+      </div>
+
+      <div class="interest" onclick="toggleInterest(this)">
+        🌍<br>Dil Pratiği
+      </div>
+
+      <div class="interest" onclick="toggleInterest(this)">
+        🍳<br>Yemek & Mutfak
+      </div>
+
+    </div>
+
+    <p class="small">
+      Birden fazla alan seçebilirsin.
+    </p>
+
+    <button class="primary" onclick="continueMatch()">
+      Devam Et
+    </button>
+
+    <button class="secondary" onclick="goHome()">
+      Geri Dön
+    </button>
+
+  </div>
+
+</section>
+
+
+<script>
+function showInterests() {
+  document.getElementById("homeScreen").style.display = "none";
+  document.getElementById("interestsScreen").style.display = "flex";
+}
+
+function goHome() {
+  document.getElementById("interestsScreen").style.display = "none";
+  document.getElementById("homeScreen").style.display = "flex";
+}
+
+function toggleInterest(element) {
+  element.classList.toggle("selected");
+}
+
+function continueMatch() {
+  const selected = document.querySelectorAll(".interest.selected");
+
+  if (selected.length === 0) {
+    alert("Devam etmek için en az bir ilgi alanı seç.");
+    return;
+  }
+
+  alert(
+    selected.length +
+    " ilgi alanı seçtin. Bir sonraki adımda uyum profilini oluşturacağız."
+  );
+}
+</script>
 
 </body>
 </html>
