@@ -17,7 +17,500 @@ body {
     background: #ffffff;
     color: #000000;
 }
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>InSync</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+    color: #000000;
+}
+
+#splash {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.logo {
+    font-size: 46px;
+    font-weight: 700;
+    letter-spacing: -2px;
+}
+
+#app {
+    display: none;
+    max-width: 620px;
+    margin: auto;
+    min-height: 100vh;
+    border-left: 1px solid #eeeeee;
+    border-right: 1px solid #eeeeee;
+    padding-bottom: 70px;
+}
+
+header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #eeeeee;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+header .logo {
+    font-size: 25px;
+    letter-spacing: -1px;
+}
+
+.post {
+    display: flex;
+    padding: 20px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #eeeeee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.content {
+    flex: 1;
+}
+
+.username {
+    font-weight: 600;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.text {
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 22px;
+    font-size: 20px;
+}
+
+.action {
+    cursor: pointer;
+}
+
+nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 620px;
+    height: 60px;
+    background: white;
+    border-top: 1px solid #eeeeee;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 23px;
+}
+
+/* PROFİL */
+
+#profile {
+    display: none;
+    min-height: 100vh;
+    background: white;
+}
+
+.profile-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eeeeee;
+    padding: 0 18px;
+}
+
+.back {
+    font-size: 27px;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.profile-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.profile-main {
+    padding: 24px 20px;
+}
+
+.profile-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-name {
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.profile-user {
+    margin-top: 5px;
+    color: #666666;
+}
+
+.big-avatar {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #eeeeee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.bio {
+    margin-top: 22px;
+    line-height: 1.5;
+}
+
+.section {
+    margin-top: 30px;
+}
+
+.section-title {
+    font-size: 14px;
+    color: #777777;
+    margin-bottom: 12px;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    border: 1px solid #dddddd;
+    border-radius: 20px;
+    padding: 8px 13px;
+    font-size: 14px;
+}
+
+.level-box {
+    margin-top: 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.level-name {
+    font-weight: 600;
+}
+
+.level-description {
+    font-size: 13px;
+    color: #666666;
+    margin-top: 6px;
+}
+
+.room {
+    padding: 15px 0;
+    border-bottom: 1px solid #eeeeee;
+    cursor: pointer;
+}
+
+.room-title {
+    font-weight: 600;
+}
+
+.room-info {
+    color: #777777;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- GİRİŞ -->
+
+<div id="splash" onclick="openApp()">
+    <div class="logo">InSync</div>
+</div>
+
+
+<!-- ANA UYGULAMA -->
+
+<div id="app">
+
+<header>
+    <div class="logo">InSync</div>
+</header>
+
+
+<div class="post">
+
+    <div class="avatar" onclick="openProfile()">D</div>
+
+    <div class="content">
+
+        <div class="username" onclick="openProfile()">deniz</div>
+
+        <div class="text">
+            A1 Almanca pratiği yapmak isteyen var mı?
+        </div>
+
+        <div class="actions">
+            <span class="action">♡</span>
+            <span class="action">○</span>
+            <span class="action">↗</span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="post">
+
+    <div class="avatar">E</div>
+
+    <div class="content">
+
+        <div class="username">elif</div>
+
+        <div class="text">
+            Felsefe üzerine sohbet etmek isteyenlerle küçük bir grup kurmak istiyorum.
+        </div>
+
+        <div class="actions">
+            <span class="action">♡</span>
+            <span class="action">○</span>
+            <span class="action">↗</span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="post">
+
+    <div class="avatar">M</div>
+
+    <div class="content">
+
+        <div class="username">mert</div>
+
+        <div class="text">
+            Akşam gitar ve müzik teorisi üzerine konuşmak isteyen var mı?
+        </div>
+
+        <div class="actions">
+            <span class="action">♡</span>
+            <span class="action">○</span>
+            <span class="action">↗</span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<nav>
+    <span>⌂</span>
+    <span>⌕</span>
+    <span>＋</span>
+    <span>♡</span>
+    <span>◎</span>
+</nav>
+
+</div>
+
+
+<!-- DENİZ PROFİLİ -->
+
+<div id="profile">
+
+    <div class="profile-header">
+        <span class="back" onclick="closeProfile()">‹</span>
+        <span class="profile-title">Profil</span>
+    </div>
+
+    <div class="profile-main">
+
+        <div class="profile-top">
+
+            <div>
+                <div class="profile-name">Deniz</div>
+                <div class="profile-user">@deniz</div>
+            </div>
+
+            <div class="big-avatar">D</div>
+
+        </div>
+
+
+        <div class="bio">
+            Dil öğrenmeyi, felsefe konuşmayı ve yeni insanlarla
+            fikir paylaşmayı seviyorum.
+        </div>
+
+
+        <div class="section">
+
+            <div class="section-title">
+                İLGİ ALANLARI
+            </div>
+
+            <div class="tags">
+                <span class="tag">🇩🇪 Almanca A1</span>
+                <span class="tag">Felsefe</span>
+                <span class="tag">Müzik</span>
+                <span class="tag">Edebiyat</span>
+            </div>
+
+        </div>
+
+
+        <div class="section">
+
+            <div class="section-title">
+                INSYNC SEVİYESİ
+            </div>
+
+            <div class="level-box">
+
+                <div class="level-name">
+                    Seviye 3 · Uyumlu
+                </div>
+
+                <div class="level-description">
+                    Düzenli katılım sağlıyor, sohbetlere katkıda
+                    bulunuyor ve toplulukla olumlu etkileşim kuruyor.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="section">
+
+            <div class="section-title">
+                AKTİF SOHBETLER
+            </div>
+
+
+            <div class="room">
+
+                <div class="room-title">
+                    🇩🇪 A1 Almanca Pratiği
+                </div>
+
+                <div class="room-info">
+                    8 kişi · Sohbet açık
+                </div>
+
+            </div>
+
+
+            <div class="room">
+
+                <div class="room-title">
+                    Felsefe Sohbetleri
+                </div>
+
+                <div class="room-info">
+                    12 kişi · Bugün aktif
+                </div>
+
+            </div>
+
+
+            <div class="room">
+
+                <div class="room-title">
+                    Müzik ve Beste
+                </div>
+
+                <div class="room-info">
+                    6 kişi · Aktif
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function openApp() {
+
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+}
+
+function openProfile() {
+
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "block";
+
+    window.scrollTo(0,0);
+
+}
+
+function closeProfile() {
+
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    window.scrollTo(0,0);
+
+}
+
+</script>
+
+</body>
+</html>
 /* GİRİŞ */
 
 #splash {
