@@ -356,7 +356,7 @@ nav {
 
 <nav>
   <span onclick="goHome()" style="cursor:pointer;">⌂</span>
-    <span>⌕</span>
+   <span onclick="openSearch()" style="cursor:pointer;">⌕</span>
   <span onclick="openCreatePost()" style="cursor:pointer;">＋</span>
     <span>♡</span>
   <span onclick="openMyProfile()" style="cursor:pointer;">◎</span>
@@ -779,6 +779,16 @@ function goHome() {
     document.getElementById("createPostPage").style.display = "none";
     document.getElementById("myProfile").style.display = "none";
     window.scrollTo(0, 0);
+}
+function openSearch() {
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("roomPage").style.display = "none";
+    document.getElementById("createPostPage").style.display = "none";
+    document.getElementById("myProfile").style.display = "none";
+
+    alert("Arama ekranı hazırlanıyor");
 }
 </script>
 
