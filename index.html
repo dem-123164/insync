@@ -252,8 +252,8 @@ button {
       </div>
 
       <div class="feed-actions">
-        <span>♡ 24</span>
-        <span>💬 8 yorum</span>
+      <span onclick="likePost(this)" style="cursor:pointer;">♡ 24</span>
+       <span onclick="toggleComments(this)" style="cursor:pointer;">💬 8 yorum</span>
       </div>
 
       <button class="feed-room"
@@ -273,7 +273,7 @@ button {
       </div>
 
       <div class="feed-actions">
-        <span>♡ 18</span>
+      <span onclick="likePost(this)" style="cursor:pointer;">♡ 18</span>
         <span>💬 5 yorum</span>
       </div>
 
@@ -729,7 +729,7 @@ function closeAyseProfile() {
     <div class="feed-text">${text}</div>
 
     <div class="feed-actions">
-      <span>♡ 0</span>
+   <span onclick="likePost(this)" style="cursor:pointer;">♡ 0</span>
       <span>💬 0 yorum</span>
     </div>
   `;
@@ -749,6 +749,65 @@ function closeAyseProfile() {
   document.getElementById("feedScreen").style.display = "flex";
   window.scrollTo(0, 0);
 }
+  function likePost(element) {
+  const number = parseInt(element.textContent.match(/\d+/)[0]);
+
+  if (element.dataset.liked === "true") {
+    element.textContent = "♡ " + (number - 1);
+    element.dataset.liked = "fals  } else {
+    element.textContent = "♥ " + (number + 1);
+    element.dataset.liked = "true";
+  }
+}
+    
+function toggleComments(element) {
+  const post = element.closest(".feed-box");
+
+  let commentBox = post.querySelector(".comment-box");
+
+  if (commentBox) {
+    commentBox.remove();
+    return;
+  }
+
+  commentBox = document.createElement("div");
+  commentBox.className = "comment-box";
+
+  commentBox.innerHTML = `
+    <input type="text"
+      placeholder="Yorum yaz..."
+      style="width:100%; padding:10px; margin-top:12px; border-radius:10px; border:none;">
+
+    <button class="primary"
+      style="margin-top:8px;"
+      onclick="addComment(this)">
+      Yorum Yap
+    </button>
+
+    <div class="comments-list"></div>
+  `;
+
+  post.appendChild(commentBox);
+}
+function addComment(button) {
+  const commentBox = button.closest(".comment-box");
+  const input = commentBox.querySelector("input");
+  const text = input.value.trim();
+
+  if (text === "") {
+    alert("Önce yorum yazmalısın.");
+    return;
+  }
+
+  const list = commentBox.querySelector(".comments-list");
+  const comment = document.createElement("div");
+
+  comment.style.marginTop = "10px";
+  comment.textContent = "Sen: " + text;
+
+  list.appendChild(comment);
+  input.value = "";
+}  
 </script>
 </body>
 </html>
