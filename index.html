@@ -363,7 +363,7 @@ nav {
   <span onclick="goHome()" style="cursor:pointer;">⌂</span>
    <span onclick="openSearch()" style="cursor:pointer;">⌕</span>
   <span onclick="openCreatePost()" style="cursor:pointer;">＋</span>
-    <span>♡</span>
+  <span onclick="openNotifications()" style="cursor:pointer;">♡</span>
   <span onclick="openMyProfile()" style="cursor:pointer;">◎</span>
 </nav>
 
@@ -675,6 +675,32 @@ nav {
     </div>
 
 </div>
+<!-- BİLDİRİMLER -->
+
+<div id="notificationsPage" style="display:none; max-width:620px; margin:0 auto; min-height:100vh; background:white; border-left:1px solid #eee; border-right:1px solid #eee;">
+
+    <div style="height:60px; display:flex; align-items:center; border-bottom:1px solid #eee; padding:0 18px;">
+        <span onclick="goHome()" style="font-size:27px; cursor:pointer; margin-right:20px;">‹</span>
+        <strong>Bildirimler</strong>
+    </div>
+
+    <div style="padding:0 20px;">
+
+        <div style="padding:18px 0; border-bottom:1px solid #eee;">
+            <strong>Deniz</strong> paylaşımını beğendi.
+        </div>
+
+        <div style="padding:18px 0; border-bottom:1px solid #eee;">
+            <strong>Elif</strong> paylaşımına yorum yaptı.
+        </div>
+
+        <div style="padding:18px 0; border-bottom:1px solid #eee;">
+            <strong>A1 Almanca Pratiği</strong> odasında yeni mesajlar var.
+        </div>
+
+    </div>
+
+</div>
 <script>
 
 function openApp() {
@@ -834,6 +860,7 @@ function goHome() {
     document.getElementById("createPostPage").style.display = "none";
     document.getElementById("myProfile").style.display = "none";
     document.getElementById("searchPage").style.display = "none";
+    document.getElementById("notificationsPage").style.display = "none";
     window.scrollTo(0, 0);
 }
 function openSearch() {
@@ -926,6 +953,18 @@ document.addEventListener("click", function(event) {
     }
 
 });
+function openNotifications() {
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("roomPage").style.display = "none";
+    document.getElementById("createPostPage").style.display = "none";
+    document.getElementById("myProfile").style.display = "none";
+    document.getElementById("searchPage").style.display = "none";
+    document.getElementById("notificationsPage").style.display = "block";
+
+    window.scrollTo(0, 0);
+}
 </script>
 
 </body>
