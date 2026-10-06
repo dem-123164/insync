@@ -572,8 +572,29 @@ function sendMessage() {
     const input = document.getElementById("messageInput");
 
     if (input.value.trim() !== "") {
-        alert("Mesaj: " + input.value);
+
+        const chat = document.querySelector(
+            "#roomPage > div:nth-child(2)"
+        );
+
+        const message = document.createElement("div");
+
+        message.style.marginBottom = "22px";
+
+        message.innerHTML =
+            "<strong>Sen</strong>" +
+            "<div style='margin-top:5px;'>" +
+            input.value +
+            "</div>";
+
+        chat.appendChild(message);
+
         input.value = "";
+
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
     }
 }
 </script>
