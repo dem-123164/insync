@@ -3,1019 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InSync App</title>
+
+<title>InSync</title>
 
 <style>
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+    color: #000000;
 }
 
-.screen {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 25px;
+/* GİRİŞ */
+
+#splash {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
-.container {
-  width: 100%;
-  max-width: 430px;
+.logo {
+    font-size: 46px;
+    font-weight: 700;
+    letter-spacing: -2px;
 }
 
-h1 {
-  font-size: 52px;
-  margin: 0 0 5px;
+/* ANA UYGULAMA */
+
+#app {
+    display: none;
+    max-width: 620px;
+    margin: auto;
+    min-height: 100vh;
+    border-left: 1px solid #eeeeee;
+    border-right: 1px solid #eeeeee;
 }
 
-h2 {
-  font-size: 28px;
-  margin-bottom: 10px;
+header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #eeeeee;
+    position: sticky;
+    top: 0;
+    background: white;
 }
 
-.subtitle {
-  color: #94a3b8;
-  margin-bottom: 30px;
-  line-height: 1.5;
+header .logo {
+    font-size: 25px;
+    letter-spacing: -1px;
 }
 
-.card {
-  background: #1e293b;
-  padding: 25px;
-  border-radius: 22px;
-  box-shadow: 0 15px 40px rgba(0,0,0,.25);
+/* PAYLAŞIMLAR */
+
+.post {
+    display: flex;
+    padding: 20px;
+    border-bottom: 1px solid #eeeeee;
 }
 
-button {
-  width: 100%;
-  border: 0;
-  padding: 16px;
-  border-radius: 12px;
-  margin-top: 12px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #eeeeee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
 
-.primary {
-  background: #4ade80;
-  color: #052e16;
+.content {
+    flex: 1;
 }
 
-.secondary {
-  background: #334155;
-  color: white;
+.username {
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
-.interests {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 20px 0;
+.text {
+    font-size: 15px;
+    line-height: 1.45;
 }
 
-.interest {
-  background: #334155;
-  border: 2px solid transparent;
-  padding: 18px 8px;
-  border-radius: 14px;
-  cursor: pointer;
-  user-select: none;
+.actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 22px;
+    font-size: 20px;
 }
 
-.interest.selected {
-  border-color: #4ade80;
-  background: #163a2a;
+.action {
+    cursor: pointer;
 }
 
-.small {
-  color: #94a3b8;
-  font-size: 13px;
+/* ALT MENÜ */
+
+nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 620px;
+    height: 60px;
+    background: white;
+    border-top: 1px solid #eeeeee;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 23px;
 }
 
-.level {
-  color: #bbf7d0;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.score {
-  width: 145px;
-  height: 145px;
-  margin: 20px auto;
-  border: 8px solid #4ade80;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.score strong {
-  font-size: 38px;
-}
-
-.score span {
-  font-size: 12px;
-  color: #cbd5e1;
-}
-
-.stats {
-  text-align: left;
-  margin: 20px 0;
-}
-
-.stat {
-  padding: 11px 0;
-  border-bottom: 1px solid #334155;
-}
-
-.person {
-  text-align: left;
-  background: #263548;
-  border-radius: 16px;
-  padding: 17px;
-  margin: 12px 0;
-}
-
-.person-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.person-name {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.match {
-  color: #4ade80;
-  font-weight: bold;
-}
-
-.tags {
-  margin-top: 10px;
-  color: #cbd5e1;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-#interestsScreen,
-#profileScreen,
-#matchesScreen {
-  display: none;
-}
-  /* ANA AKIŞ */
-
-#feedScreen {
-  display: none;
-}
-
-.feed-header {
-  margin-bottom: 20px;
-}
-
-.feed-box {
-  background: #1e293b;
-  padding: 18px;
-  border-radius: 18px;
-  margin-bottom: 15px;
-  text-align: left;
-}
-
-.feed-user {
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.feed-match {
-  color: #4ade80;
-  font-size: 14px;
-  margin-left: 8px;
-}
-
-.feed-text {
-  margin: 12px 0;
-  line-height: 1.5;
-}
-
-.feed-actions {
-  display: flex;
-  gap: 10px;
-  font-size: 14px;
-  color: #cbd5e1;
-}
-
-.feed-room {
-  margin-top: 12px;
-  background: #4ade80;
-  color: #0f172a;
-}
-  /* THREADS TARZI ANA AKIS */
-
-#feedScreen {
-  align-items: flex-start;
-  padding-top: 25px;
-}
-
-#feedScreen .container {
-  max-width: 620px;
-  width: 100%;
-}
-
-#feedScreen .feed-header {
-  text-align: center;
-  border-bottom: 1px solid #334155;
-  padding-bottom: 15px;
-}
-
-#feedScreen .feed-box {
-  background: transparent;
-  border-radius: 0;
-  border-bottom: 1px solid #334155;
-  padding: 20px 5px;
-  margin: 0;
-}
-
-#feedScreen .feed-user {
-  font-size: 16px;
-}
-
-#feedScreen .feed-text {
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-#feedScreen .feed-actions {
-  margin-top: 14px;
-  gap: 22px;
-}
-
-#feedScreen textarea {
-  background: transparent;
-  color: white;
-  border: 1px solid #334155 !important;
-}
-
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  gap: 5px;
-  margin-top: 25px;
-  padding-top: 12px;
-  border-top: 1px solid #334155;
-}
-
-.bottom-nav button {
-  flex: 1;
-  background: transparent;
-  color: white;
-  border: none;
-  padding: 12px 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
-  /* THREADS TARZI ANA AKIŞ */
-
-#feedScreen {
-  align-items: flex-start;
-  padding-top: 20px;
-}
-
-#feedScreen .container {
-  max-width: 620px;
-}
-
-#feedScreen .feed-header {
-  text-align: center;
-  padding: 10px 0 18px;
-  border-bottom: 1px solid #334155;
-}
-
-#feedScreen .feed-header h2 {
-  margin: 0;
-  font-size: 24px;
-}
-
-#feedScreen .feed-box {
-  background: transparent;
-  border-radius: 0;
-  border-bottom: 1px solid #334155;
-  padding: 18px 4px;
-  margin: 0;
-}
-
-#feedScreen .feed-user {
-  font-weight: 700;
-}
-
-#feedScreen .feed-match {
-  color: #4ade80;
-  margin-left: 8px;
-}
-
-#feedScreen .feed-text {
-  margin: 8px 0 12px;
-}
-
-#feedScreen .feed-actions {
-  display: flex;
-  gap: 22px;
-  color: #cbd5e1;
-}
-  /* THREADS TARZI PAYLASIM ALANI */
-
-#feedScreen textarea {
-  background: transparent;
-  border: none !important;
-  border-bottom: 1px solid #334155 !important;
-  border-radius: 0 !important;
-  padding: 14px 4px !important;
-  min-height: 70px !important;
-  font-size: 16px;
-  outline: none;
-}
-
-#feedScreen textarea::placeholder {
-  color: #94a3b8;
-}
-
-#feedScreen .primary {
-  border-radius: 20px;
-}
-  /* INSYNC SADE GIRIS EKRANI */
-#homeScreen {
-  background: #000;
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#homeScreen .container {
-  width: 100%;
-  text-align: center;
-}
-
-#homeScreen h1 {
-  margin: 0;
-  color: #fff;
-  font-size: 48px;
-  font-weight: 700;
-  letter-spacing: -2px;
-  cursor: pointer;
-}
-  /* ANA AKIS SADE SIYAH-BEYAZ */
-#feedScreen .primary {
-  background: #ffffff;
-  color: #000000;
-  width: auto;
-  padding: 8px 18px;
-  border-radius: 20px;
-  border: none;
-  font-weight: 600;
- 
-}
 </style>
 </head>
 
 <body>
-<!-- ORTAK ALAN / ANA AKIŞ -->
-<section id="feedScreen" class="screen">
-  <div class="container">
 
-    <div class="feed-header">
-      <h2>InSync</h2>
-     
-    </div>
-<div class="feed-box">
-  <textarea id="postInput"
-    placeholder="Bir şey paylaş..."
-    style="width:100%; min-height:80px; padding:12px; border-radius:12px; border:none; resize:none;"></textarea>
+<!-- İLK EKRAN -->
 
-  <button class="primary" onclick="addPost()">
-    Paylaş
-  </button>
+<div id="splash" onclick="openApp()">
+    <div class="logo">InSync</div>
 </div>
-   <div class="feed-box">
 
-  <div style="display:flex; gap:12px; align-items:flex-start;">
 
-    <div onclick="openProfile('Deniz')"
-         style="width:42px; height:42px; border-radius:50%;
-                background:#334155; display:flex;
-                align-items:center; justify-content:center;
-                font-weight:bold; cursor:pointer;">
-      D
-    </div>
+<!-- ANA AKIŞ -->
 
-    <div style="flex:1;">
+<div id="app">
 
-      <div>
-        <span class="feed-user"
-              onclick="openProfile('Deniz')"
-              style="cursor:pointer;">Deniz</span>
+<header>
+    <div class="logo">InSync</div>
+</header>
 
-        <span class="feed-match">%92 uyum</span>
-      </div>
 
-      <div class="feed-text">
-        Bugün Almanca A1 pratiği yapmak isteyen var mı?
-      </div>
+<div class="post">
 
-      <div class="feed-actions">
-        <span onclick="likePost(this)" style="cursor:pointer;">♡ 24</span>
-        <span onclick="toggleComments(this)" style="cursor:pointer;">💬 8 yorum</span>
-      </div>
+    <div class="avatar">D</div>
+
+    <div class="content">
+
+        <div class="username">deniz</div>
+
+        <div class="text">
+            A1 Almanca pratiği yapmak isteyen var mı?
+        </div>
+
+        <div class="actions">
+            <span class="action">♡</span>
+            <span class="action">○</span>
+            <span class="action">↗</span>
+        </div>
 
     </div>
-  </div>
 
-    <div class="feed-box">
-      <div>
-        <span class="feed-user">Elif</span>
-        <span class="feed-match">%87 uyum</span>
-      </div>
-
-      <div class="feed-text">
-        English practice tonight? A1 seviyesinde sohbet edebiliriz.
-      </div>
-
-      <div class="feed-actions">
-      <span onclick="likePost(this)" style="cursor:pointer;">♡ 18</span>
-        <span>💬 5 yorum</span>
-      </div>
-
-    
-    </div>
-
-    <button class="secondary" onclick="showMatches()">
-      Uyumlu Kişileri Gör
-    </button>
-<div class="bottom-nav">
-  <button onclick="showFeed()">🏠 Ana Akış</button>
-  <button onclick="showRooms()">💬 Odalar</button>
-  <button onclick="showMyProfile()">👤 Profil</button>
 </div>
-  </div>
-</section>
-  <!-- ODALAR EKRANI -->
-<section id="roomsScreen" class="screen" style="display:none;">
-  <div class="container">
-
-    <h2>Odalar</h2>
-    <p class="subtitle">İlgini çeken sohbete katıl.</p>
-
-    <div class="card">
-      <h3>🇩🇪 Almanca A1 Pratik</h3>
-      <p>Yeni başlayanlar için Almanca sohbet.</p>
-      <button class="primary">Odaya Katıl</button>
-    </div>
-
-    <div class="card">
-      <h3>🎵 Müzik</h3>
-      <p>Şarkılar, albümler ve müzik üzerine sohbet.</p>
-      <button class="primary">Odaya Katıl</button>
-    </div>
-
-    <div class="card">
-      <h3>💭 Felsefe</h3>
-      <p>Fikirler, sorular ve farklı bakış açıları.</p>
-      <button class="primary">Odaya Katıl</button>
-    </div>
-
-    <div class="card">
-      <h3>🍳 Yemek & Tarifler</h3>
-      <p>Tariflerini paylaş, yeni lezzetler keşfet.</p>
-      <button class="primary">Odaya Katıl</button>
-    </div>
-
-    <button class="secondary" onclick="showFeed()">
-      Ana Akışa Dön
-    </button>
-
-  </div>
-</section>
-<section id="homeScreen" class="screen">
-  <div class="container">
-    <h1 onclick="showFeed()" style="cursor:pointer;">InSync</h1>
-  </div>
-</section>
 
 
-<section id="interestsScreen" class="screen">
-  <div class="container">
+<div class="post">
 
-    <h2>Seni neler anlatıyor?</h2>
+    <div class="avatar">E</div>
 
-    <p class="subtitle">
-      İlgi alanlarını seç. InSync ortak noktalarınıza göre
-      sana daha uyumlu insanları gösterecek.
-    </p>
+    <div class="content">
 
-    <div class="interests">
+        <div class="username">elif</div>
 
-      <div class="interest" onclick="toggleInterest(this)">
-        🎵<br>Müzik
-      </div>
-
-      <div class="interest" onclick="toggleInterest(this)">
-        📚<br>Kitap & Edebiyat
-      </div>
-
-      <div class="interest" onclick="toggleInterest(this)">
-        💬<br>Felsefe
-      </div>
-
-      <div class="interest" onclick="toggleInterest(this)">
-        🎬<br>Sinema
-      </div>
-
-      <div class="interest" onclick="toggleInterest(this)">
-        🌐<br>Dil Pratiği
-      </div>
-
-      <div class="interest" onclick="toggleInterest(this)">
-        🍳<br>Yemek & Mutfak
-      </div>
-
-    </div>
-
-    <p class="small">Birden fazla alan seçebilirsin.</p>
-
-    <button class="primary" onclick="continueMatch()">
-      Devam Et
-    </button>
-
-    <button class="secondary" onclick="goHome()">
-      Geri Dön
-    </button>
-
-  </div>
-</section>
-
-
-<section id="profileScreen" class="screen">
-  <div class="container">
-
-    <h2>Uyum Profilin Hazır</h2>
-
-    <p class="subtitle">
-      Seçimlerine göre InSync profilinin ilk seviyesi oluşturuldu.
-    </p>
-
-    <div class="card">
-
-      <div class="level">Seviye 1 • Keşif</div>
-
-      <div class="score">
-        <strong id="scoreNumber">78%</strong>
-        <span>Uyum Potansiyeli</span>
-      </div>
-
-      <p>
-        Ortak ilgi alanların arttıkça ve toplulukta
-        etkileşim kurdukça uyum seviyen gelişecek.
-      </p>
-
-      <div class="stats">
-
-        <div class="stat">
-          🎯 İlgi alanı:
-          <strong id="interestCount">0</strong>
+        <div class="text">
+            Felsefe üzerine sohbet etmek isteyenlerle küçük bir grup kurmak istiyorum.
         </div>
 
-        <div class="stat">
-          🟢 Uyum Seviyesi: <strong>Başlangıç</strong>
+        <div class="actions">
+            <span class="action">♡</span>
+            <span class="action">○</span>
+            <span class="action">↗</span>
         </div>
 
-        <div class="stat">
-          ⭐ Profil Seviyesi: <strong>Keşif</strong>
+    </div>
+
+</div>
+
+
+<div class="post">
+
+    <div class="avatar">M</div>
+
+    <div class="content">
+
+        <div class="username">mert</div>
+
+        <div class="text">
+            Akşam gitar ve müzik teorisi üzerine konuşmak isteyen var mı?
         </div>
 
-        <div class="stat">
-          💬 Sonraki adım: <strong>Topluluğu keşfet</strong>
+        <div class="actions">
+            <span class="action">♡</span>
+            <span class="action">○</span>
+            <span class="action">↗</span>
         </div>
 
-      </div>
-
-      <button class="primary" onclick="showFeed()">
-  Ana Akışa Geç
-</button>
-
-      <button class="secondary" onclick="backToInterests()">
-        İlgi Alanlarını Değiştir
-      </button>
-
-    </div>
-  </div>
-</section>
-
-
-<section id="matchesScreen" class="screen">
-  <div class="container">
-
-    <h2>Seninle Aynı Frekansta</h2>
-
-    <p class="subtitle">
-      Ortak ilgi alanlarına göre öne çıkan kişiler.
-    </p>
-
-    <div class="person">
-      <div class="person-top">
-        <span class="person-name">Deniz</span>
-        <span class="match">92% uyum</span>
-      </div>
-
-      <div class="tags">
-        🎵 Alternatif müzik • 📚 Edebiyat • 💬 Felsefe
-      </div>
-
-      <button class="primary" onclick="openProfile('Deniz')">
-        Profili Gör
-      </button>
     </div>
 
-    <div class="person">
-      <div class="person-top">
-        <span class="person-name">Elif</span>
-        <span class="match">87% uyum</span>
-      </div>
+</div>
 
-      <div class="tags">
-        📚 Kitaplar • 🎬 Sinema • 🌐 Dil pratiği
-      </div>
 
-      <button class="primary" onclick="openProfile('Elif')">
-        Profili Gör
-      </button>
-    </div>
+<nav>
+    <span>⌂</span>
+    <span>⌕</span>
+    <span>＋</span>
+    <span>♡</span>
+    <span>◎</span>
+</nav>
 
-    <div class="person">
-      <div class="person-top">
-        <span class="person-name">Mert</span>
-        <span class="match">83% uyum</span>
-      </div>
+</div>
 
-      <div class="tags">
-        🎵 Müzik • 💬 Felsefe • 🍳 Mutfak
-      </div>
 
-      <button class="primary" onclick="openProfile('Mert')">
-        Profili Gör
-      </button>
-    </div>
-
-    <button class="secondary" onclick="backToProfile()">
-      Uyum Profilime Dön
-    </button>
-
-  </div>
-</section>
-
-<!-- DENİZ PROFİLİ -->
-<section id="denizProfile" class="screen" style="display:none;">
-  <div class="container">
-    <h2>Deniz</h2>
-    <p class="subtitle">%92 Uyum</p>
-
-    <div class="card">
-      <h3>Deniz'in Profili</h3>
-      <p>🎵 Alternatif Müzik &nbsp; • &nbsp; 📚 Edebiyat &nbsp; • &nbsp; 💭 Felsefe</p>
-      <p>Müzik, edebiyat ve felsefe üzerine derin sohbetlerden hoşlanıyor.</p>
-
-    <h3>Katıldığı Odalar</h3>
-<p>🎵 Müzik</p>
-<p>💭 Felsefe</p>
-<p>🌐 Almanca A1</p>
-
-<button class="primary" onclick="showRooms()">
-  Odaları Gör
-</button>
-
-      <button class="secondary" onclick="closePersonProfile()">
-        Geri Dön
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- ELİF PROFİLİ -->
-<section id="elifProfile" class="screen" style="display:none;">
-  <div class="container">
-    <h2>Elif</h2>
-    <p class="subtitle">%87 Uyum</p>
-
-    <div class="card">
-      <h3>Elif'in Profili</h3>
-      <p>📚 Kitaplar &nbsp; • &nbsp; 🎬 Sinema &nbsp; • &nbsp; 🌐 Dil Pratiği</p>
-      <p>Kitaplar, sinema ve yabancı dil pratiğiyle ilgileniyor.</p>
-
-      <button class="primary" onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
-        Mesaj Gönder
-      </button>
-
-      <button class="secondary" onclick="closePersonProfile()">
-        Geri Dön
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- MERT PROFİLİ -->
-<section id="mertProfile" class="screen" style="display:none;">
-  <div class="container">
-    <h2>Mert</h2>
-    <p class="subtitle">%83 Uyum</p>
-
-    <div class="card">
-      <h3>Mert'in Profili</h3>
-      <p>🎵 Müzik &nbsp; • &nbsp; 💭 Felsefe &nbsp; • &nbsp; 🍳 Mutfak</p>
-      <p>Müzik, felsefe ve farklı mutfaklar üzerine sohbet etmeyi seviyor.</p>
-
-      <button class="primary" onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
-        Mesaj Gönder
-      </button>
-
-      <button class="secondary" onclick="closePersonProfile()">
-        Geri Dön
-      </button>
-    </div>
-  </div>
-</section>
 <script>
 
-function hideAll() {
-  document.getElementById("homeScreen").style.display = "none";
-  document.getElementById("interestsScreen").style.display = "none";
-  document.getElementById("profileScreen").style.display = "none";
-  document.getElementById("matchesScreen").style.display = "none";
-  document.getElementById("feedScreen").style.display = "none";
-  document.getElementById("roomsScreen").style.display = "none";
+function openApp() {
+
+    document.getElementById("splash").style.display = "none";
+
+    document.getElementById("app").style.display = "block";
+
 }
 
-function showInterests() {
-  hideAll();
-  document.getElementById("interestsScreen").style.display = "flex";
-  window.scrollTo(0,0);
-}
-
-function goHome() {
-  hideAll();
-  document.getElementById("homeScreen").style.display = "flex";
-}
-
-function toggleInterest(element) {
-  element.classList.toggle("selected");
-}
-
-function continueMatch() {
-
-  const selected =
-    document.querySelectorAll(".interest.selected");
-
-  if (selected.length === 0) {
-    alert("Devam etmek için en az bir ilgi alanı seç.");
-    return;
-  }
-
-  document.getElementById("interestCount").textContent =
-    selected.length;
-
-  let score = 66 + (selected.length * 4);
-
-  if (score > 96) {
-    score = 96;
-  }
-
-  document.getElementById("scoreNumber").textContent =
-    score + "%";
-
-  hideAll();
-
-  document.getElementById("profileScreen").style.display =
-    "flex";
-
-  window.scrollTo(0,0);
-}
-
-function backToInterests() {
-  hideAll();
-
-  document.getElementById("interestsScreen").style.display =
-    "flex";
-
-  window.scrollTo(0,0);
-}
-
-function showMatches() {
-
-  hideAll();
-
-  document.getElementById("matchesScreen").style.display =
-    "flex";
-
-  window.scrollTo(0,0);
-}
-
-function backToProfile() {
-
-  hideAll();
-
-  document.getElementById("profileScreen").style.display =
-    "flex";
-
-  window.scrollTo(0,0);
-}
-
-function openProfile(name) {
-    hideAll();
-
-    if (name === "Deniz") {
-        document.getElementById("denizProfile").style.display = "flex";
-    } else if (name === "Elif") {
-        document.getElementById("elifProfile").style.display = "flex";
-    } else if (name === "Mert") {
-        document.getElementById("mertProfile").style.display = "flex";
-    }
-
-    window.scrollTo(0, 0);
-}
-
-function closePersonProfile() {
-    hideAll();
-    document.getElementById("matchesScreen").style.display = "flex";
-    window.scrollTo(0, 0);
-}
 </script>
-<!-- AYŞE PROFİL EKRANI -->
-<section id="ayseProfile" class="screen" style="display:none;">
-  <div class="container">
 
-    <h2>Ayşe</h2>
-    <div style="color:#4ade80; font-size:22px; font-weight:bold; margin-bottom:20px;">
-      %91 Uyum
-    </div>
-
-    <div class="card">
-      <div style="font-size:60px; margin-bottom:15px;">A</div>
-
-      <h3>Ayşe</h3>
-
-      <p style="color:#4ade80; font-weight:bold;">
-        %91 Uyum
-      </p>
-
-      <p>
-        🎵 Müzik &nbsp;&nbsp;
-        💬 Felsefe &nbsp;&nbsp;
-        🌐 Almanca
-      </p>
-
-      <p>
-        Benzer müziklerden hoşlanıyor. Felsefe üzerine sohbet etmeyi
-        ve Almanca pratik yapmayı seviyor.
-      </p>
-
-      <button onclick="alert('Mesajlaşma özelliğini bir sonraki aşamada ekleyeceğiz.')">
-        Mesaj Gönder
-      </button>
-
-      <button class="secondary" onclick="closeAyseProfile()">
-        Geri Dön
-      </button>
-    </div>
-
-  </div>
-</section>
-
-<script>
-function openAyseProfile() {
-  hideAll();
-  document.getElementById("ayseProfile").style.display = "flex";
-  window.scrollTo(0,0);
-}
-
-function closeAyseProfile() {
-  hideAll();
-  document.getElementById("matchesScreen").style.display = "flex";
-  window.scrollTo(0,0);
-}
-  function addPost() {
-  const input = document.getElementById("postInput");
-  const text = input.value.trim();
-
-  if (text === "") {
-    alert("Önce bir şey yazmalısın.");
-    return;
-  }
-
-  const post = document.createElement("div");
-  post.className = "feed-box";
-
-  post.innerHTML = `
-    <div>
-      <span class="feed-user">Sen</span>
-    </div>
-
-    <div class="feed-text">${text}</div>
-
-    <div class="feed-actions">
-   <span onclick="likePost(this)" style="cursor:pointer;">♡ 0</span>
-      <span>💬 0 yorum</span>
-    </div>
-  `;
-
-  const feed = document.getElementById("feedScreen")
-    .querySelector(".container");
-
-  const composer = document.getElementById("postInput")
-    .closest(".feed-box");
-
-  composer.insertAdjacentElement("afterend", post);
-
-  input.value = "";
-}
-  function showFeed() {
-  hideAll();
-  document.getElementById("feedScreen").style.display = "flex";
-  window.scrollTo(0, 0);
-}
-  function likePost(element) {
-  const number = parseInt(element.textContent.match(/\d+/)[0]);
-
-  if (element.dataset.liked === "true") {
-    element.textContent = "♡ " + (number - 1);
-  element.dataset.liked = "false";
-} else {
-    element.textContent = "♥ " + (number + 1);
-    element.dataset.liked = "true";
-  }
-}
-    
-function toggleComments(element) {
-  const post = element.closest(".feed-box");
-
-  let commentBox = post.querySelector(".comment-box");
-
-  if (commentBox) {
-    commentBox.remove();
-    return;
-  }
-
-  commentBox = document.createElement("div");
-  commentBox.className = "comment-box";
-
-  commentBox.innerHTML = `
-    <input type="text"
-      placeholder="Yorum yaz..."
-      style="width:100%; padding:10px; margin-top:12px; border-radius:10px; border:none;">
-
-    <button class="primary"
-      style="margin-top:8px;"
-      onclick="addComment(this)">
-      Yorum Yap
-    </button>
-
-    <div class="comments-list"></div>
-  `;
-
-  post.appendChild(commentBox);
-}
-function addComment(button) {
-  const commentBox = button.closest(".comment-box");
-  const input = commentBox.querySelector("input");
-  const text = input.value.trim();
-
-  if (text === "") {
-    alert("Önce yorum yazmalısın.");
-    return;
-  }
-
-  const list = commentBox.querySelector(".comments-list");
-  const comment = document.createElement("div");
-
-  comment.style.marginTop = "10px";
-  comment.textContent = "Sen: " + text;
-
-  list.appendChild(comment);
-  input.value = "";
-}  
-  function showRooms() {
-  hideAll();
-  document.getElementById("roomsScreen").style.display = "flex";
-  window.scrollTo(0, 0);
-}
-</script>
 </body>
 </html>
