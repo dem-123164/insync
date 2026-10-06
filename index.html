@@ -305,7 +305,7 @@ nav {
         <div class="actions">
            <span class="action" onclick="toggleLike(this)">♡</span>
            <span class="action" onclick="addComment(this)">○</span>
-            <span class="action">↗</span>
+            <span class="action" onclick="sharePost(this)">↗</span>
         </div>
 
     </div>
@@ -328,7 +328,7 @@ nav {
         <div class="actions">
             <span class="action" onclick="toggleLike(this)">♡</span>
           <span class="action" onclick="addComment(this)">○</span>
-            <span class="action">↗</span>
+            <span class="action" onclick="sharePost(this)">↗</span>
         </div>
 
     </div>
@@ -351,7 +351,7 @@ nav {
         <div class="actions">
            <span class="action" onclick="toggleLike(this)">♡</span>
           <span class="action" onclick="addComment(this)">○</span>
-            <span class="action">↗</span>
+           <span class="action" onclick="sharePost(this)">↗</span>
         </div>
 
     </div>
@@ -896,6 +896,14 @@ function addComment(element) {
 
         post.querySelector(".content").appendChild(newComment);
     }
+}
+    function sharePost(element) {
+    const post = element.closest(".post");
+    const text = post.querySelector(".text").textContent;
+
+    navigator.clipboard.writeText(text).then(function() {
+        alert("Paylaşım kopyalandı");
+    });
 }
 </script>
 
