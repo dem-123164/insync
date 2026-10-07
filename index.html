@@ -330,7 +330,7 @@ nav {
 
     <div class="content">
 
-        <div class="username">mert</div>
+       <div class="username" onclick="openMertProfile()">mert</div>
 
         <div class="text">
             Akşam gitar ve müzik teorisi üzerine konuşmak isteyen var mı?
@@ -583,6 +583,43 @@ nav {
         </button>
 
     </div>
+
+</div>
+    <!-- MERT PROFİLİ -->
+
+<div id="mertProfile" style="display:none; max-width:620px; margin:0 auto; min-height:100vh; background:white;">
+
+  <div class="profile-header">
+    <span class="back" onclick="closeMertProfile()">‹</span>
+    <span class="profile-title">Profil</span>
+  </div>
+
+  <div class="profile-main">
+
+    <div class="profile-top">
+      <div>
+        <div class="profile-name">Mert</div>
+        <div class="profile-user">@mert</div>
+      </div>
+
+      <div class="big-avatar">M</div>
+    </div>
+
+    <div class="bio">
+      Gitar, müzik teorisi ve yeni insanlarla müzik üzerine sohbet etmekle ilgileniyorum.
+    </div>
+
+    <div class="section">
+      <div class="section-title">İLGİ ALANLARI</div>
+
+      <div class="tags">
+        <span class="tag">🎸 Gitar</span>
+        <span class="tag">🎵 Müzik</span>
+        <span class="tag">🎼 Müzik Teorisi</span>
+      </div>
+    </div>
+
+  </div>
 
 </div>
     <!-- YENİ PAYLAŞIM EKRANI -->
@@ -1079,7 +1116,20 @@ function closeMyProfile() {
     document.getElementById("elifProfile").style.display = "block";
     window.scrollTo(0, 0);
 }
-
+function openMertProfile() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("myProfile").style.display = "none";
+    document.getElementById("roomPage").style.display = "none";
+    document.getElementById("elifProfile").style.display = "none";
+    document.getElementById("mertProfile").style.display = "block";
+    window.scrollTo(0, 0);
+}
+    function closeMertProfile() {
+    document.getElementById("mertProfile").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    window.scrollTo(0, 0);
+}
 function closeElifProfile() {
     document.getElementById("elifProfile").style.display = "none";
     document.getElementById("app").style.display = "block";
