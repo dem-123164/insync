@@ -855,6 +855,11 @@ function saveProfile() {
         if (avatar) {
             avatar.textContent = name.charAt(0).toUpperCase();
         }
+        // Ana sayfadaki profil harfini de güncelle
+const headerAvatar = document.getElementById("headerAvatar");
+if (headerAvatar && name) {
+    headerAvatar.textContent = name.charAt(0).toUpperCase();
+}
     }
 
     if (username) {
