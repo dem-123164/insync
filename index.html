@@ -689,6 +689,11 @@ nav {
             K
         </div>
         <div style="font-size:14px;">Profil fotoğrafı</div>
+        <input type="file"
+       id="profilePhotoInput"
+       accept="image/*"
+       onchange="changeProfilePhoto(event)"
+       style="margin-top:10px;">
     </div>
 
     <div style="margin-bottom:20px;">
@@ -872,12 +877,52 @@ if (headerAvatar && name) {
     document.getElementById("myProfile").style.display = "block";
     window.scrollTo(0, 0);
 }
+function changeProfilePhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const photo = e.target.result;
+
+        // Fotoğrafı tarayıcıda sakla
+        localStorage.setItem("insyncProfilePhoto", photo);
+
+        // Profil düzenleme ekranındaki fotoğraf
+        const editAvatar = document.getElementById("editProfileAvatar");
+
+        if (editAvatar) {
+            editAvatar.innerHTML =
+                '<img src="' + photo + '" style="width:100%;height:100%;object-fit:cover;">';
+        }
+
+        // Ana profil sayfasındaki büyük avatar
+        const profileAvatar =
+            document.querySelector("#myProfile .big-avatar");
+
+        if (profileAvatar) {
+            profileAvatar.innerHTML =
+                '<img src="' + photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        }
+
+        // Ana akışın sağ üstündeki profil
+        const homeAvatar =
+            document.getElementById("homeProfileAvatar");
+
+        if (homeAvatar) {
+            homeAvatar.innerHTML =
+                '<img src="' + photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        }
+    };
+
+    reader.readAsDataURL(file);
+}
     function loadProfile() {
     const name = localStorage.getItem("insyncName");
     const username = localStorage.getItem("insyncUsername");
     const bio = localStorage.getItem("insyncBio");
-
+const photo = localStorage.getItem("insyncProfilePhoto");
     if (name) {
         document.querySelector("#myProfile .profile-name").textContent = name;
 
@@ -899,6 +944,34 @@ if (headerAvatar && name) {
         document.querySelector("#myProfile .bio").textContent = bio;
         document.getElementById("editBio").value = bio;
     }
+        if (photo) {
+    const avatar = document.querySelector("#myProfile .big-avatar");
+    if (avatar) {
+        avatar.textContent = "";
+        avatar.style.backgroundImage = `url(${photo})`;
+        avatar.style.backgroundSize = "cover";
+        avatar.style.backgroundPosition = "center";
+    }
+
+    const editAvatar = document.getElementById("editProfileAvatar");
+    if (editAvatar) {
+        editAvatar.textContent = "";
+        editAvatar.style.backgroundImage = `url(${photo})`;
+        editAvatar.style.backgroundSize = "cover";
+        editAvatar.style.backgroundPosition = "center";
+    }
+
+    const headerAvatar =
+        document.getElementById("headerAvatar") ||
+        document.querySelector('header div[onclick="openMyProfile()"]');
+
+    if (headerAvatar) {
+        headerAvatar.textContent = "";
+        headerAvatar.style.backgroundImage = `url(${photo})`;
+        headerAvatar.style.backgroundSize = "cover";
+        headerAvatar.style.backgroundPosition = "center";
+    }
+}
 }
 
 window.addEventListener("DOMContentLoaded", loadProfile);
