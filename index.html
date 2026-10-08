@@ -960,6 +960,13 @@ function changeProfilePhoto(event) {
     const username = localStorage.getItem("insyncUsername");
     const bio = localStorage.getItem("insyncBio");
 const photo = localStorage.getItem("insyncProfilePhoto");
+        const headerUsername = document.getElementById("headerUsername");
+
+if (headerUsername) {
+  headerUsername.textContent = username
+    ? "@" + username.replace("@", "")
+    : (name || "Profil");
+}
     if (name) {
         document.querySelector("#myProfile .profile-name").textContent = name;
 
