@@ -1447,6 +1447,11 @@ window.loginUser = async function() {
   const splash = document.getElementById("splash");
   const appPage = document.getElementById("app");
 
+const bottomNav = document.querySelector("nav");
+if (bottomNav) {
+  bottomNav.style.display = user ? "flex" : "none";
+}
+
   if (user) {
     authPage.style.display = "none";
     splash.style.display = "none";
