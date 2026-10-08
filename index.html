@@ -195,5 +195,58 @@ onAuthStateChanged(auth, async u => {
 $('menu').addEventListener('click',()=>{$('menuPanel').hidden=!$('menuPanel').hidden});$('logout').addEventListener('click',async()=>{try{await signOut(auth);$('menuPanel').hidden=true}catch(err){notify('Çıkış yapılamadı: '+err.code)}});$('headerProfile').addEventListener('click',()=>show('profile'));document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));$('composerButton').addEventListener('click',()=>show('create'));$('composerPost').addEventListener('click',()=>show('create'));$('tabAll').addEventListener('click',()=>{filter='all';$('tabAll').classList.add('active');$('tabMine').classList.remove('active');renderFeed()});$('tabMine').addEventListener('click',()=>{filter='mine';$('tabMine').classList.add('active');$('tabAll').classList.remove('active');renderFeed()});$('searchInput').addEventListener('input',renderSearch);
 $('publish').addEventListener('click',async()=>{const text=$('postText').value.trim();if(!text)return;$('publish').disabled=true;$('postError').textContent='';try{await addDoc(collection(db,'posts'),{text,userId:user.uid,username:username(),createdAt:serverTimestamp()});$('postText').value='';show('home');notify('Paylaşım yayınlandı')}catch(err){$('postError').textContent='Paylaşılamadı: '+err.code}finally{$('publish').disabled=false}});
 $('chatForm').addEventListener('submit',async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text||!room)return;const currentRoom=room.id;const button=$('chatForm').querySelector('button');button.disabled=true;$('chatError').textContent='';try{await addDoc(collection(db,'rooms',currentRoom,'messages'),{text,userId:user.uid,username:username(),createdAt:serverTimestamp()});$('chatInput').value=''}catch(err){$('chatError').textContent='Mesaj gönderilemedi: '+err.code+'. Firestore kurallarını kontrol et.'}finally{button.disabled=false}});
-$('backRooms').addEventListener('click',()=>{stopChat?.();stopChat=null;show('rooms')});$('editProfile').addEventListener('click',()=>{$('editName').value=getProfile('name','insyncName')||displayName();$('editUsername').value=username();$('editBio').value=getProfile('bio','insyncBio');show('edit')});$('saveProfile').addEventListener('click',()=>{const n=$('editName').value.trim(),u=$('editUsername').value.trim().replace(/^@/,'');if(!n||!u){notify('Ad ve kullanıcı adı gerekli');return}localStorage.setItem(profileKey('name'),n);localStorage.setItem(profileKey('username'),u);localStorage.setItem(profileKey('bio'),$('editBio').value.trim());renderProfile();show('profile');notify('Profil bu cihazda kaydedildi')});$('editPhoto').addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>500000){notify('Fotoğraf 500 KB altında olmalı');return}const reader=new FileReader();reader.onload=()=>{try{localStorage.setItem(profileKey('photo'),reader.result);renderProfile();notify('Fotoğraf bu cihazda kaydedildi')}catch{notify('Fotoğraf kaydedilemedi')}};reader.readAsDataURL(file)});
+$('backRooms').addEventListener('click',()=>{stopChat?.();stopChat=null;show('rooms')});$('editProfile').addEventListener('click',()=>{$('editName').value=getProfile('name','insyncName')||displayName();$('editUsername').value=username();$('editBio').value=getProfile('bio','insyncBio');show('edit')});$('saveProfile').addEventListener('click',()=>{const n=$('editName').value.trim(),u=$('editUsername').value.trim().replace(/^@/,'');if(!n||!u){notify('Ad ve kullanıcı adı gerekli');return}localStorage.setItem(profileKey('name'),n);localStorage.setItem(profileKey('username'),u);localStorage.setItem(profileKey('bio'),$('editBio').value.trim());renderProfile();show('profile');notify('Profil bu cihazda kaydedildi')});$('editPhoto').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  try {
+    const photoData = await compressProfilePhoto(file);
+
+    localStorage.setItem(profileKey('photo'), photoData);
+    renderProfile();
+
+    await savePhotoToFirestore(photoData);
+
+    notify('Profil fotoğrafı kaydedildi');
+  } catch (err) {
+    notify('Fotoğraf kaydedilemedi: ' + err.message);
+  }
+});
+async function savePhotoToFirestore(photoData) {
+  if (!user) return;
+  await setDoc(
+    doc(db, 'users', user.uid),
+    { photo: photoData },
+    { merge: true }
+  );
+}
+  function compressProfilePhoto(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 160;
+      canvas.height = 160;
+
+      const ctx = canvas.getContext('2d');
+      const side = Math.min(img.width, img.height);
+      const x = (img.width - side) / 2;
+      const y = (img.height - side) / 2;
+
+      ctx.drawImage(img, x, y, side, side, 0, 0, 160, 160);
+      URL.revokeObjectURL(url);
+
+      resolve(canvas.toDataURL('image/jpeg', 0.65));
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Fotoğraf okunamadı'));
+    };
+
+    img.src = url;
+  });
+}
 </script></body></html>
