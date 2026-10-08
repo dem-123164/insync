@@ -27,7 +27,31 @@ function profileKey(key){return 'insync:'+user.uid+':'+key}function getProfile(k
 function username(){return getProfile('username','insyncUsername').replace(/^@/,'')||user.email.split('@')[0]}
 function displayName(){return getProfile('name','insyncName')||username()}
 function avatar(target,letter){target.textContent=(letter||displayName()).charAt(0).toUpperCase();target.style.backgroundImage=photo?`url(${JSON.stringify(photo)})`:'';if(photo)target.textContent=''}
-function show(next){if(!user)return;page=nename=el('span'xt;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===next));document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===next||(next==='chat'&&b.dataset.page==='rooms')||(next==='edit'&&b.dataset.page==='profile')));if(next==='profile')renderProfile();if(next==='search')renderSearch();window.scrollTo(0,0)}
+
+function show(next) {
+  if (!user) return;
+
+  page = next;
+
+  document.querySelectorAll('.page').forEach(p =>
+    p.classList.toggle('active', p.id === next)
+  );
+
+  document.querySelectorAll('.bottom button').forEach(b =>
+    b.classList.toggle(
+      'active',
+      b.dataset.page === next ||
+      (next === 'chat' && b.dataset.page === 'rooms') ||
+      (next === 'edit' && b.dataset.page === 'profile')
+    )
+  );
+
+  if (next === 'profile') renderProfile();
+  if (next === 'search') renderSearch();
+
+  window.scrollTo(0, 0);
+}
+
 
 async function openUserProfile(userId) {
   if (!userId) return;
