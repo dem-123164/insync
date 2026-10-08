@@ -1096,7 +1096,16 @@ function publishPost() {
 
     const firstPost = document.querySelector("#app .post");
     firstPost.parentNode.insertBefore(newPost, firstPost);
+const savedPosts = JSON.parse(
+  localStorage.getItem("insyncPosts") || "[]"
+);
 
+savedPosts.unshift(input.value);
+
+localStorage.setItem(
+  "insyncPosts",
+  JSON.stringify(savedPosts)
+);
     input.value = "";
 
     document.getElementById("createPostPage").style.display = "none";
@@ -1104,7 +1113,45 @@ function publishPost() {
 
     window.scrollTo(0, 0);
 }
-function openMyProfile() {
+function loadSavedPosts() {
+  const posts = JSON.parse(
+    localStorage.getItem("insyncPosts") || "[]"
+  );
+
+  const firstPost = document.querySelector("#app .post");
+  if (!firstPost) return;
+
+  posts.slice().reverse().forEach(function(text) {
+    const newPost = document.createElement("div");
+    newPost.className = "post";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = (
+      localStorage.getItem("insyncName") || "Sen"
+    ).charAt(0).toUpperCase();
+
+    const content = document.createElement("div");
+    content.className = "content";
+
+    const username = document.createElement("div");
+    username.className = "username";
+    username.textContent =
+      localStorage.getItem("insyncUsername") || "Sen";
+
+    const postText = document.createElement("div");
+    postText.className = "text";
+    postText.textContent = text;
+
+    content.append(username, postText);
+    newPost.append(avatar, content);
+
+    firstPost.parentNode.insertBefore(newPost, firstPost);
+  });
+}
+
+window.addEventListener("DOMContentLoaded", loadSavedPosts);
+    function openMyProfile() {
     document.getElementById("app").style.display = "none";
     document.getElementById("profile").style.display = "none";
     document.getElementById("roomPage").style.display = "none";
