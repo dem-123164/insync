@@ -131,7 +131,18 @@ panel.appendChild(divider);
 }
   function renderProfile(){photo=getProfile('photo','insyncProfilePhoto');$('profileName').textContent=displayName();$('profileHandle').textContent='@'+username();$('profileBio').textContent=getProfile('bio','insyncBio')||'InSync’te yeni insanlarla tanışıyor, öğreniyor ve paylaşıyorum.';['headerAvatar','composeAvatar','profileAvatar'].forEach(id=>avatar($(id)));$('myPosts').replaceChildren();const mine=posts.filter(p=>p.userId===user.uid);if(!mine.length)$('myPosts').append(el('p','muted','Henüz paylaşımın yok.'));else mine.forEach(p=>$('myPosts').append(postElement(p)))}
 function postElement(p){const root=el('article','post'),av=el('div','avatar',((p.username||'Üye').charAt(0)||'?').toUpperCase()),body=el('div','postbody'),head=el('div','posthead'),name=el('button','name',p.username||'Üye'),date=el('span','date',p.createdAt?.toDate?.()?.toLocaleDateString('tr-TR')||''),txt=el('div','posttext',p.text||''),actions=el('div','actions');name.type='button';
-name.style.cursor='pointer';
+if (p.userId) {
+  getDoc(doc(db, 'users', p.userId)).then(snap => {
+    const photo = snap.data()?.photo;
+    if (photo) {
+      av.textContent = '';
+      av.style.backgroundImage = `url("${photo}")`;
+      av.style.backgroundSize = 'cover';
+      av.style.backgroundPosition = 'center';
+    }
+  }).catch(console.error);
+}
+                        name.style.cursor='pointer';
 name.addEventListener('click',()=>{
   if(p.userId===user.uid){
     show('profile');
