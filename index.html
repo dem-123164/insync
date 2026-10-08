@@ -16,7 +16,7 @@
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
 import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
+import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'};
 const firebase=initializeApp(firebaseConfig),auth=getAuth(firebase),db=getFirestore(firebase),$=id=>document.getElementById(id);
 const rooms=[{id:'almanca-a1',icon:'🇩🇪',name:'Almanca A1',desc:'Temel Almanca konuşma pratiği'},{id:'almanca-a2',icon:'🇩🇪',name:'Almanca A2',desc:'Günlük hayatta Almanca'},{id:'almanca-b1',icon:'🇩🇪',name:'Almanca B1',desc:'Daha akıcı konuşmalar'},{id:'muzik',icon:'🎵',name:'Müzik ve Beste',desc:'Müzisyenler, şarkılar, üretim'},{id:'kitap',icon:'📚',name:'Kitap ve Edebiyat',desc:'Okuduklarımız üzerine sohbet'},{id:'felsefe',icon:'💭',name:'Felsefe',desc:'Fikirler ve düşünceler'}];
@@ -27,9 +27,44 @@ function profileKey(key){return 'insync:'+user.uid+':'+key}function getProfile(k
 function username(){return getProfile('username','insyncUsername').replace(/^@/,'')||user.email.split('@')[0]}
 function displayName(){return getProfile('name','insyncName')||username()}
 function avatar(target,letter){target.textContent=(letter||displayName()).charAt(0).toUpperCase();target.style.backgroundImage=photo?`url(${JSON.stringify(photo)})`:'';if(photo)target.textContent=''}
-function show(next){if(!user)return;page=next;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===next));document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===next||(next==='chat'&&b.dataset.page==='rooms')||(next==='edit'&&b.dataset.page==='profile')));if(next==='profile')renderProfile();if(next==='search')renderSearch();window.scrollTo(0,0)}
-function renderProfile(){photo=getProfile('photo','insyncProfilePhoto');$('profileName').textContent=displayName();$('profileHandle').textContent='@'+username();$('profileBio').textContent=getProfile('bio','insyncBio')||'InSync’te yeni insanlarla tanışıyor, öğreniyor ve paylaşıyorum.';['headerAvatar','composeAvatar','profileAvatar'].forEach(id=>avatar($(id)));$('myPosts').replaceChildren();const mine=posts.filter(p=>p.userId===user.uid);if(!mine.length)$('myPosts').append(el('p','muted','Henüz paylaşımın yok.'));else mine.forEach(p=>$('myPosts').append(postElement(p)))}
-function postElement(p){const root=el('article','post'),av=el('div','avatar',((p.username||'Üye').charAt(0)||'?').toUpperCase()),body=el('div','postbody'),head=el('div','posthead'),name=el('span','name',p.username||'Üye'),date=el('span','date',p.createdAt?.toDate?.()?.toLocaleDateString('tr-TR')||''),txt=el('div','posttext',p.text||''),actions=el('div','actions');head.append(name,date);const share=el('button','','↗ Paylaş');share.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(p.text||'');notify('Metin kopyalandı')}catch{notify('Kopyalanamadı')}});const like=el('button','','♡ Beğen');like.addEventListener('click',()=>{like.classList.toggle('liked');like.textContent=like.classList.contains('liked')?'♥ Beğenildi':'♡ Beğen'});const comment=el('button','','◯ Yanıtla');comment.addEventListener('click',()=>notify('Yanıtlar yakında eklenecek'));actions.append(like,comment,share);body.append(head,txt,actions);root.append(av,body);return root}
+function show(next){if(!user)return;page=nename=el('span'xt;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===next));document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===next||(next==='chat'&&b.dataset.page==='rooms')||(next==='edit'&&b.dataset.page==='profile')));if(next==='profile')renderProfile();if(next==='search')renderSearch();window.scrollTo(0,0)}
+
+async function openUserProfile(userId) {
+  if (!userId) return;
+  if (userId === user.uid) {
+    show('profile');
+    return;
+  }
+
+  try {
+    const snap = await getDoc(doc(db, 'users', userId));
+
+    if (!snap.exists()) {
+      notify('Kullanıcı profili bulunamadı.');
+      return;
+    }
+
+    const profile = snap.data();
+    alert(
+      'Kullanıcı: ' + (profile.username || 'Üye') +
+      '\nAdı: ' + (profile.name || '') +
+      '\nHakkında: ' + (profile.bio || '')
+    );
+  } catch (err) {
+    notify('Profil açılamadı: ' + err.code);
+  }
+}
+
+  function renderProfile(){photo=getProfile('photo','insyncProfilePhoto');$('profileName').textContent=displayName();$('profileHandle').textContent='@'+username();$('profileBio').textContent=getProfile('bio','insyncBio')||'InSync’te yeni insanlarla tanışıyor, öğreniyor ve paylaşıyorum.';['headerAvatar','composeAvatar','profileAvatar'].forEach(id=>avatar($(id)));$('myPosts').replaceChildren();const mine=posts.filter(p=>p.userId===user.uid);if(!mine.length)$('myPosts').append(el('p','muted','Henüz paylaşımın yok.'));else mine.forEach(p=>$('myPosts').append(postElement(p)))}
+function postElement(p){const root=el('article','post'),av=el('div','avatar',((p.username||'Üye').charAt(0)||'?').toUpperCase()),body=el('div','postbody'),head=el('div','posthead'),name=el('button','name',p.username||'Üye'),date=el('span','date',p.createdAt?.toDate?.()?.toLocaleDateString('tr-TR')||''),txt=el('div','posttext',p.text||''),actions=el('div','actions');name.type='button';
+name.style.cursor='pointer';
+name.addEventListener('click',()=>{
+  if(p.userId===user.uid){
+    show('profile');
+  }else{
+  openUserProfile(p.userId);
+  }
+});head.append(name,date);const share=el('button','','↗ Paylaş');share.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(p.text||'');notify('Metin kopyalandı')}catch{notify('Kopyalanamadı')}});const like=el('button','','♡ Beğen');like.addEventListener('click',()=>{like.classList.toggle('liked');like.textContent=like.classList.contains('liked')?'♥ Beğenildi':'♡ Beğen'});const comment=el('button','','◯ Yanıtla');comment.addEventListener('click',()=>notify('Yanıtlar yakında eklenecek'));actions.append(like,comment,share);body.append(head,txt,actions);root.append(av,body);return root}
 function renderFeed(){const arr=filter==='mine'?posts.filter(p=>p.userId===user.uid):posts;$('feed').replaceChildren();$('feedStatus').textContent=arr.length?'':(filter==='mine'?'Henüz paylaşım yapmadın.':'Henüz paylaşım yok. İlk paylaşımı sen yap!');arr.forEach(p=>$('feed').append(postElement(p)));if(page==='profile')renderProfile()}
 function renderSearch(){const q=$('searchInput').value.toLocaleLowerCase('tr').trim(),box=$('searchResults');box.replaceChildren();rooms.filter(r=>(r.name+' '+r.desc).toLocaleLowerCase('tr').includes(q)).forEach(r=>box.append(roomElement(r)));posts.filter(p=>(p.text+' '+p.username).toLocaleLowerCase('tr').includes(q)).slice(0,30).forEach(p=>box.append(postElement(p)));if(!box.children.length)box.append(el('p','empty','Sonuç bulunamadı.'))}
 function roomElement(r){const item=el('div','room'),icon=el('div','emoji',r.icon),info=el('div','roominfo'),name=el('strong','',r.name),desc=el('small','',r.desc),btn=el('button','pill','Katıl');info.append(name,desc);item.append(icon,info,btn);btn.addEventListener('click',()=>openRoom(r));return item}
