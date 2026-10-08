@@ -1348,6 +1348,7 @@ function openNotifications() {
   signInWithEmailAndPassword,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -1366,7 +1367,8 @@ function openNotifications() {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
+const db = getFirestore(app);
+window.insyncDB = db;
 window.registerUser = async function() {
   const email = document.getElementById("authEmail").value.trim();
   const password = document.getElementById("authPassword").value;
