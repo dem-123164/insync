@@ -1,263 +1,268 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#ffffff"><title>InSync · Birlikte keşfet</title>
+<html lang="tr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>InSync · Birlikte keşfet</title>
 <style>
-:root{font-family:Inter,Arial,sans-serif;color:#171717;background:#f7f7f7}*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}.shell{width:min(100%,620px);min-height:100dvh;margin:auto;background:#fff;border-inline:1px solid #eee;padding-bottom:calc(82px + env(safe-area-inset-bottom))}.top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;z-index:5}.brand{font-size:25px;font-weight:850;letter-spacing:-1.5px}.iconbtn{border:0;background:none;padding:8px;font-size:22px;color:#222}.avatar{height:42px;width:42px;flex-shrink:0;background:#eee;border-radius:50%;display:grid;place-items:center;font-weight:700;overflow:hidden;background-size:cover;background-position:center}.avatar.small{height:34px;width:34px;font-size:13px}.muted{color:#888}.tabs{display:flex;border-bottom:1px solid #eee}.tabs button{flex:1;background:none;border:0;padding:17px 8px;color:#888;font-weight:600;border-bottom:2px solid transparent}.tabs button.active{color:#111;border-color:#111}.composer{display:flex;gap:12px;align-items:center;padding:18px 20px;border-bottom:8px solid #f7f7f7}.composer button{flex:1;text-align:left;border:0;background:none;color:#888}.pill{border:1px solid #ddd;border-radius:24px;background:#fff;padding:9px 15px;font-weight:650}.primary{background:#111;color:#fff;border:1px solid #111}.post{display:flex;gap:12px;padding:20px;border-bottom:1px solid #eee}.postbody{flex:1;min-width:0}.posthead{display:flex;gap:8px;align-items:center}.name{font-weight:750;overflow-wrap:anywhere}.date{color:#999;font-size:12px}.posttext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;margin:10px 0}.actions{display:flex;gap:18px;margin-top:12px}.actions button{border:0;background:none;color:#555;padding:5px 0;font-size:14px}.actions button.liked{color:#e11d48}.section{padding:22px 20px}.section h2{margin:0 0 18px;font-size:23px}.search{width:100%;padding:14px 17px;background:#f4f4f4;border:1px solid #eee;border-radius:13px;outline:none}.room{display:flex;gap:14px;align-items:center;padding:18px 0;border-bottom:1px solid #eee}.room .emoji{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:#f5f5f5;font-size:25px}.roominfo{flex:1}.roominfo strong{display:block;margin-bottom:5px}.roominfo small{color:#777}.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,620px);height:calc(65px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;align-items:center;z-index:9}.bottom button{border:0;background:none;font-size:23px;padding:10px 14px;color:#777}.bottom button.active{color:#111}.bottom .plus{font-size:29px}.page{display:none}.page.active{display:block}.field{width:100%;border:1px solid #ddd;border-radius:12px;padding:13px;margin:8px 0}.formlabel{font-size:13px;font-weight:700;margin-top:12px;display:block}.formbutton{width:100%;padding:13px;margin-top:10px;border-radius:22px}.status{padding:15px 20px;color:#666;font-size:14px}.profilehero{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.profilehero h2{margin:0 0 5px}.tags{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.tag{border:1px solid #ddd;border-radius:20px;padding:7px 12px;font-size:13px}.chatmessages{padding:20px;min-height:45vh;max-height:calc(100dvh - 255px);overflow-y:auto}.bubble{padding:11px 13px;border:1px solid #eee;border-radius:13px;margin-bottom:12px;overflow-wrap:anywhere}.bubble strong{font-size:13px}.bubble p{margin:7px 0 0;white-space:pre-wrap}.chatbar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #eee;background:#fff}.chatbar input{flex:1;min-width:0;border:1px solid #ddd;border-radius:22px;padding:12px 14px}.chatbar button{border-radius:22px;padding:0 16px}.empty{padding:28px 20px;text-align:center;color:#888;line-height:1.5}.auth{max-width:380px;margin:10vh auto;padding:25px}.auth h1{font-size:44px;letter-spacing:-2px;margin-bottom:8px}.notice{font-size:13px;color:#777;line-height:1.5}.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#222;color:#fff;border-radius:14px;padding:12px 17px;z-index:20;max-width:90%;display:none}#loading{padding:90px 25px;text-align:center}textarea{resize:vertical}#main{display:none}@media(min-width:621px){.shell{box-shadow:0 0 40px #00000008}}@media(max-width:380px){.post,.section{padding-inline:14px}.bottom button{padding:9px}}
-</style></head><body><div class="shell"><div id="loading">InSync yükleniyor…</div>
-<section id="auth" class="auth" hidden><h1>InSync</h1><p class="muted">Birlikte keşfet. Birlikte konuş.</p><form id="authForm"><input class="field" id="email" type="email" autocomplete="email" placeholder="E-posta" required><input class="field" id="password" type="password" autocomplete="current-password" placeholder="Şifre (en az 6 karakter)" minlength="6" required><button id="login" class="pill primary formbutton" type="submit">Giriş yap</button><button id="register" class="pill formbutton" type="button">Üye ol</button><p class="notice" id="authError" role="alert"></p></form></section>
-<div id="main"><header class="top"><button class="iconbtn" id="menu" aria-label="Menü">⋯</button><div class="brand">InSync</div><button class="iconbtn" id="headerProfile" aria-label="Profilim"><span id="headerAvatar" class="avatar small">?</span></button></header><div id="menuPanel" hidden style="padding:12px 20px;border-bottom:1px solid #eee"><button id="logout" class="pill">Çıkış yap</button></div>
-<section class="page active" id="home"><div class="tabs"><button id="tabAll" class="active">Sana özel</button><button id="tabMine">Paylaşımlarım</button></div><div class="composer"><span class="avatar small" id="composeAvatar">?</span><button id="composerButton">Neler düşünüyorsun?</button><button class="pill" id="composerPost">Paylaş</button></div><div id="feedStatus" class="status">Paylaşımlar yükleniyor…</div><div id="feed"></div></section>
-<section class="page" id="search"><div class="section"><h2>Keşfet</h2><input class="search" id="searchInput" placeholder="Paylaşımlarda veya odalarda ara…"><div id="searchResults"></div></div></section>
-<section class="page" id="create"><div class="section"><h2>Yeni paylaşım</h2><textarea class="field" id="postText" maxlength="2000" rows="7" placeholder="Ne paylaşmak istiyorsun?"></textarea><button class="pill primary formbutton" id="publish">Paylaş</button><p class="notice" id="postError" role="alert"></p></div></section>
-<section class="page" id="rooms"><div class="section"><h2>Sohbet odaları</h2><p class="muted">Ortak ilgi alanlarında buluş, birlikte öğren.</p><div id="roomList"></div><p class="notice">Mesajlaşma için Firestore güvenlik kurallarında oda mesajlarına izin verilmesi gerekir.</p></div></section>
-<section class="page" id="chat"><div class="section" style="padding-bottom:10px"><button class="iconbtn" id="backRooms">‹</button><h2 id="chatTitle" style="display:inline;margin-left:10px"></h2><p class="muted" id="chatDescription"></p></div><div class="chatmessages" id="messages"></div><form class="chatbar" id="chatForm"><input id="chatInput" maxlength="1000" placeholder="Mesaj yaz…" required><button class="pill primary" type="submit">Gönder</button></form><p class="notice" style="padding:0 20px" id="chatError" role="alert"></p></section>
-<section class="page" id="profile"><div class="section"><div class="profilehero"><div><h2 id="profileName">Kullanıcı</h2><div id="profileHandle" class="muted">@kullanici</div></div><div id="profileAvatar" class="avatar" style="height:76px;width:76px;font-size:28px">?</div></div><p id="profileBio">InSync'te yeni insanlarla tanışıyor, öğreniyor ve paylaşıyorum.</p><div class="tags" id="profileTags"><span class="tag">🇩🇪 Almanca</span><span class="tag">🎵 Müzik</span><span class="tag">📚 Kitaplar</span></div><button id="editProfile" class="pill">Profili düzenle</button><h3 style="margin-top:30px">Paylaşımlarım</h3><div id="myPosts"></div></div></section>
-<section class="page" id="edit"><div class="section"><h2>Profili düzenle</h2><label class="formlabel" for="editName">Ad</label><input class="field" id="editName" maxlength="70"><label class="formlabel" for="editUsername">Kullanıcı adı</label><input class="field" id="editUsername" maxlength="35"><label class="formlabel" for="editBio">Hakkımda</label><textarea class="field" id="editBio" maxlength="300" rows="4"></textarea><label class="formlabel" for="editPhoto">Profil fotoğrafı (bu cihazda saklanır)</label><input class="field" id="editPhoto" type="file" accept="image/*"><button class="pill primary formbutton" id="saveProfile">Kaydet</button></div></section>
-<nav class="bottom" aria-label="Ana menü"><button data-page="home" class="active" title="Ana akış" aria-label="Ana akış">⌂</button><button data-page="search" title="Ara" aria-label="Ara">⌕</button><button data-page="create" class="plus" title="Paylaş" aria-label="Paylaş">＋</button><button data-page="rooms" title="Sohbet odaları" aria-label="Sohbet odaları">♧</button><button data-page="profile" title="Profilim" aria-label="Profilim">◎</button></nav></div></div><div class="toast" id="toast" role="status"></div>
+:root{--bg:#fff;--fg:#111;--mut:#8a8a8a;--line:#ececec;--soft:#f5f5f5;--red:#e11d48;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#101010;--fg:#f3f3f3;--mut:#8f8f8f;--line:#262626;--soft:#1b1b1b}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;background:none;border:0;padding:0}button:disabled{opacity:.5}
+.shell{max-width:620px;min-height:100dvh;margin:auto;border-inline:1px solid var(--line);padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.top{position:sticky;top:0;z-index:5;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{font-size:24px;font-weight:800;letter-spacing:-1.2px}.ib{font-size:22px;padding:8px}
+.avatar{width:42px;height:42px;flex:none;border-radius:50%;background:var(--soft) center/cover;display:grid;place-items:center;font-weight:700;border:1px solid var(--line)}
+.avatar.sm{width:32px;height:32px;font-size:13px}.avatar.lg{width:78px;height:78px;font-size:30px}
+.mut{color:var(--mut)}.pill{border:1px solid var(--line);border-radius:22px;padding:8px 16px;font-weight:600}
+.pill.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{flex:1;padding:14px 12px;color:var(--mut);font-weight:600;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.active{color:var(--fg);border-color:var(--fg)}
+.page{display:none}.page.active{display:block}.sec{padding:20px}.sec h2{margin:0 0 6px;font-size:22px}
+.compose{display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:6px solid var(--soft)}
+.compose button.fake{flex:1;text-align:left;color:var(--mut)}
+.post,.reply{display:flex;gap:12px;padding:16px;border-bottom:1px solid var(--line)}
+.pb{flex:1;min-width:0}.ph{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.name{font-weight:700;overflow-wrap:anywhere}.date{color:var(--mut);font-size:13px}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:12px;padding:1px 8px;color:var(--mut)}
+.txt{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0 4px;line-height:1.55}
+.acts{display:flex;gap:18px;flex-wrap:wrap}.acts button{color:var(--mut);font-size:14px;padding:6px 0}.acts button.on{color:var(--red)}
+.field{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:12px;margin:6px 0}
+textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700;margin-top:12px}
+.room{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.room .em{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:var(--soft);font-size:24px}.room .ri{flex:1}.room small{color:var(--mut)}
+.msgs{padding:16px;height:calc(100dvh - 270px);min-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.bubble{max-width:82%;padding:9px 13px;border-radius:16px;background:var(--soft);overflow-wrap:anywhere}
+.bubble b{font-size:12px;display:block;color:var(--mut)}.bubble p{margin:2px 0 0;white-space:pre-wrap}
+.bubble.me{align-self:flex-end;background:var(--fg);color:var(--bg)}.bubble.me b{color:inherit;opacity:.65}
+.bar{display:flex;gap:8px;padding:10px 16px;position:sticky;bottom:calc(64px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
+.bar input{flex:1;min-width:0;border:1px solid var(--line);background:var(--soft);border-radius:22px;padding:10px 14px}
+.empty{padding:28px 16px;text-align:center;color:var(--mut)}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,620px);display:flex;justify-content:space-around;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:9}
+.bottom button{font-size:23px;padding:14px 18px;color:var(--mut)}.bottom button.active{color:var(--fg)}
+.auth{max-width:380px;margin:12vh auto;padding:24px}.auth h1{font-size:44px;letter-spacing:-2px;margin:0 0 6px}
+.err{color:var(--red);font-size:14px;min-height:20px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#222;color:#fff;border-radius:12px;padding:11px 16px;z-index:20;max-width:90%}
+.hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.hero h2{margin:0}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+</style></head><body>
+<div class="shell">
+<div id="loading" class="empty" style="padding:90px 20px">InSync yükleniyor…</div>
+
+<section id="auth" class="auth" hidden>
+ <h1>InSync</h1><p class="mut">Dil, müzik ve edebiyat odalarında birlikte konuş.</p>
+ <form id="authForm">
+  <input class="field" id="email" type="email" autocomplete="email" placeholder="E-posta" required>
+  <input class="field" id="password" type="password" autocomplete="current-password" placeholder="Şifre (en az 6 karakter)" minlength="6" required>
+  <button class="pill pri" style="width:100%;margin-top:8px" type="submit">Giriş yap</button>
+  <button class="pill" style="width:100%;margin-top:8px" type="button" id="register">Üye ol</button>
+  <p class="err" id="authErr" role="alert"></p>
+ </form>
+</section>
+
+<div id="app" hidden>
+<header class="top">
+ <button class="ib" id="menuBtn" aria-label="Menü">⋯</button>
+ <div class="brand">InSync</div>
+ <button class="ib" id="meBtn" aria-label="Profilim"><span class="avatar sm" id="meAv"></span></button>
+</header>
+<div id="menu" hidden style="padding:12px 16px;border-bottom:1px solid var(--line)"><button class="pill" id="logout">Çıkış yap</button></div>
+
+<section class="page active" id="p-home">
+ <div class="tabs" id="topicTabs">
+  <button data-t="all" class="active">Tümü</button><button data-t="dil">Dil</button><button data-t="muzik">Müzik</button><button data-t="edebiyat">Edebiyat</button>
+ </div>
+ <div class="compose"><span class="avatar sm" id="compAv"></span><button class="fake" id="fake">Neler düşünüyorsun?</button><button class="pill" id="fakeBtn">Paylaş</button></div>
+ <div id="feedStatus" class="empty">Paylaşımlar yükleniyor…</div><div id="feed"></div>
+</section>
+
+<section class="page" id="p-search"><div class="sec"><h2>Keşfet</h2>
+ <input class="field" id="q" placeholder="Paylaşımlarda veya odalarda ara…"><div id="results"></div></div></section>
+
+<section class="page" id="p-create"><div class="sec"><h2>Yeni paylaşım</h2>
+ <textarea class="field" id="postText" rows="6" maxlength="2000" placeholder="Ne paylaşmak istiyorsun?"></textarea>
+ <label class="lbl" for="postTopic">Başlık</label>
+ <select class="field" id="postTopic"><option value="genel">Genel</option><option value="dil">Dil</option><option value="muzik">Müzik</option><option value="edebiyat">Edebiyat</option></select>
+ <button class="pill pri" style="width:100%;margin-top:10px" id="publish">Paylaş</button><p class="err" id="postErr" role="alert"></p></div></section>
+
+<section class="page" id="p-rooms"><div class="sec" style="padding-bottom:0"><h2>Sohbet odaları</h2><p class="mut" style="margin:0 0 8px">Ortak ilgi alanında buluş, birlikte öğren.</p></div>
+ <div class="tabs" id="roomTabs"><button data-c="dil">Diller</button><button data-c="muzik">Müzik</button><button data-c="edebiyat">Edebiyat</button></div>
+ <div class="sec" id="roomList"></div></section>
+
+<section class="page" id="p-chat">
+ <div class="sec" style="padding-bottom:6px"><button class="ib" id="backRooms" aria-label="Odalara dön">‹</button><b id="chatTitle" style="font-size:20px"></b><p class="mut" id="chatDesc" style="margin:2px 0 0 12px"></p></div>
+ <div class="msgs" id="messages"></div>
+ <form class="bar" id="chatForm"><input id="chatInput" maxlength="1000" placeholder="Mesaj yaz…" autocomplete="off" required><button class="pill pri" type="submit">Gönder</button></form>
+</section>
+
+<section class="page" id="p-thread">
+ <div style="padding:8px 12px"><button class="ib" id="backHome" aria-label="Geri">‹</button></div>
+ <div id="threadPost"></div><div id="replies"></div>
+ <form class="bar" id="replyForm"><input id="replyInput" maxlength="1000" placeholder="Yanıt yaz…" autocomplete="off" required><button class="pill pri" type="submit">Yanıtla</button></form>
+</section>
+
+<section class="page" id="p-profile"><div class="sec">
+ <div class="hero"><div><h2 id="pName"></h2><div class="mut" id="pHandle"></div></div><div class="avatar lg" id="pAv"></div></div>
+ <p id="pBio"></p><button class="pill" id="editBtn">Profili düzenle</button>
+ <h3 style="margin:26px 0 0">Paylaşımlar</h3></div><div id="pPosts"></div></section>
+
+<section class="page" id="p-edit"><div class="sec"><h2>Profili düzenle</h2>
+ <label class="lbl" for="eName">Ad</label><input class="field" id="eName" maxlength="70">
+ <label class="lbl" for="eUser">Kullanıcı adı</label><input class="field" id="eUser" maxlength="35">
+ <label class="lbl" for="eBio">Hakkımda</label><textarea class="field" id="eBio" rows="3" maxlength="300"></textarea>
+ <label class="lbl" for="ePhoto">Profil fotoğrafı</label><input class="field" id="ePhoto" type="file" accept="image/*">
+ <button class="pill pri" style="width:100%;margin-top:10px" id="saveProfile">Kaydet</button></div></section>
+
+<nav class="bottom" aria-label="Ana menü">
+ <button data-go="home" class="active" aria-label="Ana akış">⌂</button><button data-go="search" aria-label="Ara">⌕</button>
+ <button data-go="create" aria-label="Yeni paylaşım" style="font-size:29px">＋</button><button data-go="rooms" aria-label="Sohbet odaları">♧</button><button data-go="profile" aria-label="Profilim">◎</button>
+</nav>
+</div></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
 import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,setDoc}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
-const firebaseConfig={apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'};
-const firebase=initializeApp(firebaseConfig),auth=getAuth(firebase),db=getFirestore(firebase),$=id=>document.getElementById(id);
-const rooms=[{id:'almanca-a1',icon:'🇩🇪',name:'Almanca A1',desc:'Temel Almanca konuşma pratiği'},{id:'almanca-a2',icon:'🇩🇪',name:'Almanca A2',desc:'Günlük hayatta Almanca'},{id:'almanca-b1',icon:'🇩🇪',name:'Almanca B1',desc:'Daha akıcı konuşmalar'},{id:'muzik',icon:'🎵',name:'Müzik ve Beste',desc:'Müzisyenler, şarkılar, üretim'},{id:'kitap',icon:'📚',name:'Kitap ve Edebiyat',desc:'Okuduklarımız üzerine sohbet'},{id:'felsefe',icon:'💭',name:'Felsefe',desc:'Fikirler ve düşünceler'}];
-let user=null,posts=[],filter='all',page='home',room=null,stopPosts=null,stopChat=null,photo='';
-const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n};
-function notify(message){$('toast').textContent=message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3500)}
-function profileKey(key){return 'insync:'+user.uid+':'+key}function getProfile(key,legacy){return localStorage.getItem(profileKey(key))||''}
-function username(){return getProfile('username','insyncUsername').replace(/^@/,'')||user.email.split('@')[0]}
-function displayName(){return getProfile('name','insyncName')||username()}
-function avatar(target,letter){target.textContent=(letter||displayName()).charAt(0).toUpperCase();target.style.backgroundImage=photo?`url(${JSON.stringify(photo)})`:'';if(photo)target.textContent=''}
+import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
-function show(next) {
-  if (!user) return;
+const app=initializeApp({apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'});
+const auth=getAuth(app),db=getFirestore(app);
 
-  page = next;
+const TOPICS={genel:'Genel',dil:'Dil',muzik:'Müzik',edebiyat:'Edebiyat'};
+const ROOMS=[
+ {id:'almanca-a1',c:'dil',i:'🇩🇪',n:'Almanca A1',d:'Temel Almanca konuşma pratiği'},
+ {id:'almanca-a2',c:'dil',i:'🇩🇪',n:'Almanca A2',d:'Günlük hayatta Almanca'},
+ {id:'almanca-b1',c:'dil',i:'🇩🇪',n:'Almanca B1',d:'Daha akıcı konuşmalar'},
+ {id:'ingilizce',c:'dil',i:'🇬🇧',n:'İngilizce',d:'Her seviyeden konuşma pratiği'},
+ {id:'ispanyolca',c:'dil',i:'🇪🇸',n:'İspanyolca',d:'Hola! Birlikte pratik yapalım'},
+ {id:'fransizca',c:'dil',i:'🇫🇷',n:'Fransızca',d:'Bonjour! Sohbet ve telaffuz'},
+ {id:'japonca',c:'dil',i:'🇯🇵',n:'Japonca',d:'Hiragana’dan günlük konuşmaya'},
+ {id:'muzik',c:'muzik',i:'🎵',n:'Müzik ve Beste',d:'Müzisyenler, şarkılar, üretim'},
+ {id:'muzik-mix',c:'muzik',i:'🎚️',n:'Mix ve Prodüksiyon',d:'Kayıt, mix, mastering soruları'},
+ {id:'muzik-enstruman',c:'muzik',i:'🎸',n:'Enstrüman ve Bağlama',d:'Çalma, akort, repertuvar'},
+ {id:'muzik-paylasim',c:'muzik',i:'🎧',n:'Şarkı Paylaşımı',d:'Dinlediklerini ve yaptıklarını paylaş'},
+ {id:'kitap',c:'edebiyat',i:'📚',n:'Kitap ve Edebiyat',d:'Okuduklarımız üzerine sohbet'},
+ {id:'siir',c:'edebiyat',i:'🪶',n:'Şiir',d:'Şiir okuma ve yazma'},
+ {id:'hikaye',c:'edebiyat',i:'✍️',n:'Hikâye Atölyesi',d:'Yazdıklarını paylaş, geri bildirim al'},
+ {id:'felsefe',c:'edebiyat',i:'💭',n:'Felsefe',d:'Fikirler ve düşünceler'}];
+const ERR={'auth/invalid-credential':'E-posta veya şifre hatalı.','auth/invalid-email':'E-posta adresi geçersiz.','auth/email-already-in-use':'Bu e-posta zaten kayıtlı. Giriş yapmayı dene.','auth/weak-password':'Şifre en az 6 karakter olmalı.','auth/too-many-requests':'Çok fazla deneme. Biraz sonra tekrar dene.','permission-denied':'İzin yok. firestore.rules dosyasını Firebase’e yükle.'};
 
-  document.querySelectorAll('.page').forEach(p =>
-    p.classList.toggle('active', p.id === next)
-  );
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!==undefined)n.textContent=x;return n};
+const msg=e=>ERR[e.code]||'Hata: '+(e.code||e.message);
+let user=null,me={},posts=[],topic='all',page='home',viewUid=null,threadId=null,room=null,roomCat='dil',stop={},tt;
+const users=new Map();
+const getUser=uid=>{if(!users.has(uid))users.set(uid,getDoc(doc(db,'users',uid)).then(s=>s.data()||{}).catch(()=>({})));return users.get(uid)};
+const handle=()=>me.username||user.email.split('@')[0];
 
-  document.querySelectorAll('.bottom button').forEach(b =>
-    b.classList.toggle(
-      'active',
-      b.dataset.page === next ||
-      (next === 'chat' && b.dataset.page === 'rooms') ||
-      (next === 'edit' && b.dataset.page === 'profile')
-    )
-  );
+function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3500)}
+function ago(ts){const d=ts?.toDate?.();if(!d)return'şimdi';const s=(Date.now()-d)/1000;if(s<60)return'şimdi';if(s<3600)return Math.floor(s/60)+' dk';if(s<86400)return Math.floor(s/3600)+' sa';if(s<604800)return Math.floor(s/86400)+' gün';return d.toLocaleDateString('tr-TR')}
+function paint(n,u,fb){const ph=u?.photo;if(ph&&ph.startsWith('data:image/')){n.textContent='';n.style.backgroundImage=`url("${ph}")`}else{n.style.backgroundImage='';n.textContent=(u?.name||u?.username||fb||'?').charAt(0).toUpperCase()}}
+function paintMe(){['meAv','compAv'].forEach(id=>paint($(id),me,handle()))}
 
-  if (next === 'profile') renderProfile();
-  if (next === 'search') renderSearch();
+function go(n){page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
+ const nav={chat:'rooms',thread:'home',edit:'profile'}[n]||n;
+ document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===nav));scrollTo(0,0);
+ if(n==='search')renderSearch();if(n==='rooms')renderRooms()}
 
-  window.scrollTo(0, 0);
-}
+/* ---------- Paylaşımlar ---------- */
+function postEl(p){
+ const r=el('article','post'),av=el('button','avatar'),b=el('div','pb'),h=el('div','ph'),nm=el('button','name',p.username||'Üye');
+ paint(av,null,p.username);getUser(p.userId).then(u=>paint(av,u,p.username));
+ av.onclick=nm.onclick=()=>openProfile(p.userId);
+ h.append(nm,el('span','date',ago(p.createdAt)));
+ if(p.topic&&p.topic!=='genel')h.append(el('span','chip',TOPICS[p.topic]||p.topic));
+ const likes=p.likes||[],liked=likes.includes(user.uid),acts=el('div','acts');
+ const lk=el('button',liked?'on':'',(liked?'♥ ':'♡ ')+(likes.length||'Beğen'));
+ lk.onclick=()=>updateDoc(doc(db,'posts',p.id),{likes:liked?arrayRemove(user.uid):arrayUnion(user.uid)}).catch(e=>toast(msg(e)));
+ const rp=el('button','','◯ '+(p.replyCount?p.replyCount+' yanıt':'Yanıtla'));rp.onclick=()=>openThread(p.id);
+ const sh=el('button','','↗ Kopyala');sh.onclick=async()=>{try{await navigator.clipboard.writeText(p.text||'');toast('Metin kopyalandı')}catch{toast('Kopyalanamadı')}};
+ acts.append(lk,rp,sh);
+ if(p.userId===user.uid){const d=el('button','','Sil');d.onclick=async()=>{if(!confirm('Bu paylaşım silinsin mi?'))return;try{await deleteDoc(doc(db,'posts',p.id));if(page==='thread')go('home')}catch(e){toast(msg(e))}};acts.append(d)}
+ b.append(h,el('div','txt',p.text||''),acts);r.append(av,b);return r}
+function renderFeed(){
+ const arr=posts.filter(p=>topic==='all'||p.topic===topic);
+ $('feed').replaceChildren(...arr.map(postEl));
+ $('feedStatus').textContent=arr.length?'':'Bu başlıkta henüz paylaşım yok. İlk paylaşımı sen yap!';
+ $('feedStatus').hidden=!!arr.length;
+ if(page==='profile')renderProfile();if(page==='thread')renderThread();if(page==='search')renderSearch()}
+function startFeed(){stop.feed=onSnapshot(query(collection(db,'posts'),orderBy('createdAt','desc'),limit(100)),s=>{posts=s.docs.map(d=>({id:d.id,...d.data()}));renderFeed()},e=>{$('feedStatus').hidden=false;$('feedStatus').textContent='Paylaşımlar yüklenemedi. '+msg(e)})}
 
+/* ---------- Yanıtlar ---------- */
+function replyEl(m){const r=el('div','reply'),av=el('button','avatar sm'),b=el('div','pb'),h=el('div','ph');
+ paint(av,null,m.username);getUser(m.userId).then(u=>paint(av,u,m.username));av.onclick=()=>openProfile(m.userId);
+ h.append(el('span','name',m.username||'Üye'),el('span','date',ago(m.createdAt)));b.append(h,el('div','txt',m.text||''));r.append(av,b);return r}
+function openThread(id){threadId=id;stop.rep?.();$('replies').replaceChildren();go('thread');renderThread();
+ stop.rep=onSnapshot(query(collection(db,'posts',id,'replies'),orderBy('createdAt','asc'),limit(200)),s=>$('replies').replaceChildren(...s.docs.map(d=>replyEl(d.data()))),e=>toast(msg(e)))}
+function renderThread(){const p=posts.find(x=>x.id===threadId);$('threadPost').replaceChildren(p?postEl(p):el('p','empty','Bu paylaşım bulunamadı.'))}
+$('replyForm').onsubmit=async e=>{e.preventDefault();const t=$('replyInput').value.trim();if(!t||!threadId)return;
+ try{await addDoc(collection(db,'posts',threadId,'replies'),{text:t,userId:user.uid,username:handle(),createdAt:serverTimestamp()});
+  await updateDoc(doc(db,'posts',threadId),{replyCount:increment(1)});$('replyInput').value=''}catch(err){toast(msg(err))}};
+$('backHome').onclick=()=>{stop.rep?.();go('home')};
 
-async function openUserProfile(userId) {
-  if (!userId) return;
-  if (userId === user.uid) {
-    show('profile');
-    return;
-  }
+/* ---------- Odalar ---------- */
+function roomEl(r){const i=el('div','room'),info=el('div','ri'),b=el('button','pill','Katıl');
+ info.append(el('b','',r.n),el('br'),el('small','',r.d));i.append(el('div','em',r.i),info,b);b.onclick=()=>openRoom(r);return i}
+function renderRooms(){document.querySelectorAll('#roomTabs button').forEach(b=>b.classList.toggle('active',b.dataset.c===roomCat));
+ $('roomList').replaceChildren(...ROOMS.filter(r=>r.c===roomCat).map(roomEl))}
+function openRoom(r){room=r;stop.chat?.();$('chatTitle').textContent=r.i+' '+r.n;$('chatDesc').textContent=r.d;
+ $('messages').replaceChildren(el('p','empty','Mesajlar yükleniyor…'));go('chat');
+ stop.chat=onSnapshot(query(collection(db,'rooms',r.id,'messages'),orderBy('createdAt','desc'),limit(100)),s=>{
+  const list=s.docs.map(d=>d.data()).reverse(),box=$('messages');
+  box.replaceChildren(...(list.length?list.map(m=>{const b=el('div','bubble'+(m.userId===user.uid?' me':''));b.append(el('b','',m.username||'Üye'),el('p','',m.text||''));return b}):[el('p','empty','Henüz mesaj yok. İlk mesajı sen yaz!')]));
+  box.scrollTop=box.scrollHeight},e=>$('messages').replaceChildren(el('p','empty',msg(e))))}
+$('chatForm').onsubmit=async e=>{e.preventDefault();const t=$('chatInput').value.trim();if(!t||!room)return;
+ try{await addDoc(collection(db,'rooms',room.id,'messages'),{text:t,userId:user.uid,username:handle(),createdAt:serverTimestamp()});$('chatInput').value=''}catch(err){toast(msg(err))}};
+$('backRooms').onclick=()=>{stop.chat?.();go('rooms')};
+$('roomTabs').onclick=e=>{const c=e.target.dataset.c;if(c){roomCat=c;renderRooms()}};
 
-  try {
-    const snap = await getDoc(doc(db, 'users', userId));
+/* ---------- Arama ---------- */
+function renderSearch(){const q=$('q').value.toLocaleLowerCase('tr').trim(),box=$('results');
+ const rs=ROOMS.filter(r=>(r.n+' '+r.d).toLocaleLowerCase('tr').includes(q)).map(roomEl);
+ const ps=posts.filter(p=>((p.text||'')+' '+(p.username||'')).toLocaleLowerCase('tr').includes(q)).slice(0,30).map(postEl);
+ box.replaceChildren(...rs,...ps);if(!box.children.length)box.append(el('p','empty','Sonuç bulunamadı.'))}
+$('q').oninput=renderSearch;
 
-    if (!snap.exists()) {
-      notify('Kullanıcı profili bulunamadı.');
-      return;
-    }
+/* ---------- Profil ---------- */
+function openProfile(uid){viewUid=uid;go('profile');renderProfile()}
+async function renderProfile(){const uid=viewUid||user.uid,own=uid===user.uid,u=own?me:await getUser(uid);
+ $('pName').textContent=u.name||u.username||'InSync üyesi';$('pHandle').textContent='@'+(u.username||'uye');
+ $('pBio').textContent=u.bio||'Henüz bir şey yazılmamış.';$('editBtn').hidden=!own;paint($('pAv'),u);
+ const mine=posts.filter(p=>p.userId===uid);
+ $('pPosts').replaceChildren(...(mine.length?mine.map(postEl):[el('p','empty','Henüz paylaşım yok.')]))}
+$('editBtn').onclick=()=>{$('eName').value=me.name||'';$('eUser').value=me.username||'';$('eBio').value=me.bio||'';$('ePhoto').value='';go('edit')};
+function squarePhoto(file){return new Promise((ok,no)=>{const img=new Image(),url=URL.createObjectURL(file);
+ img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const s=Math.min(img.width,img.height);
+  c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,160,160);URL.revokeObjectURL(url);ok(c.toDataURL('image/jpeg',.7))};
+ img.onerror=()=>{URL.revokeObjectURL(url);no(new Error('Fotoğraf okunamadı'))};img.src=url})}
+$('saveProfile').onclick=async()=>{const name=$('eName').value.trim(),username=$('eUser').value.trim().replace(/^@/,'').replace(/\s+/g,'');
+ if(!name||!username)return toast('Ad ve kullanıcı adı gerekli');
+ const data={name,username,bio:$('eBio').value.trim()};
+ try{const f=$('ePhoto').files[0];if(f)data.photo=await squarePhoto(f);
+  await setDoc(doc(db,'users',user.uid),data,{merge:true});me={...me,...data};users.set(user.uid,Promise.resolve(me));
+  paintMe();openProfile(user.uid);toast('Profil kaydedildi')}catch(err){toast(msg(err))}};
 
-    const profile = snap.data();
-   showUserProfilePage(userId, profile);
-  } catch (err) {
-    notify('Profil açılamadı: ' + err.code);
-  }
-}
-function showUserProfilePage(userId, profile) {
-  let panel = document.getElementById('otherUserProfile');
+/* ---------- Yeni paylaşım ---------- */
+$('publish').onclick=async()=>{const text=$('postText').value.trim();if(!text)return;$('publish').disabled=true;$('postErr').textContent='';
+ try{await addDoc(collection(db,'posts'),{text,topic:$('postTopic').value,userId:user.uid,username:handle(),likes:[],replyCount:0,createdAt:serverTimestamp()});
+  $('postText').value='';go('home');toast('Paylaşım yayınlandı')}catch(err){$('postErr').textContent=msg(err)}finally{$('publish').disabled=false}};
 
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'otherUserProfile';
-  panel.style.cssText = 'position:fixed;inset:0;background:#fff;color:#111;z-index:9999;overflow-y:auto;padding:24px max(20px, calc((100% - 600px) / 2));font-family:Arial,sans-serif;box-sizing:border-box;';
-    document.body.appendChild(panel);
-  }
+/* ---------- Giriş / çıkış ---------- */
+$('authForm').onsubmit=async e=>{e.preventDefault();$('authErr').textContent='';try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authErr').textContent=msg(err)}};
+$('register').onclick=async()=>{$('authErr').textContent='';try{await createUserWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authErr').textContent=msg(err)}};
+$('logout').onclick=async()=>{try{await signOut(auth);$('menu').hidden=true}catch(err){toast(msg(err))}};
+$('menuBtn').onclick=()=>$('menu').hidden=!$('menu').hidden;
+$('meBtn').onclick=()=>openProfile(user.uid);
+$('fake').onclick=$('fakeBtn').onclick=()=>go('create');
+$('topicTabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;topic=t;document.querySelectorAll('#topicTabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));renderFeed()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
 
-  panel.replaceChildren();
-
-  const back = document.createElement('button');
-  back.textContent = '← Geri';
-  back.style.cssText = 'background:none;border:0;font-size:18px;cursor:pointer;margin-bottom:25px';
-  back.onclick = () => { panel.remove(); };
-  panel.appendChild(back);
-const avatarBox = document.createElement('div');
-avatarBox.textContent = (profile.name || profile.username || 'U').charAt(0).toUpperCase();
-avatarBox.style.cssText = 'width:72px;height:72px;border-radius:50%;background:#222;color:white;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;margin-bottom:18px;';
-panel.appendChild(avatarBox);
-  const title = document.createElement('h2');
-  title.style.cssText = 'font-size:26px;font-weight:700;margin:0 0 8px 0;letter-spacing:-0.5px;';
-  title.textContent = profile.name || profile.username || 'InSync üyesi';
-  panel.appendChild(title);
-
-  const handle = document.createElement('p');
-  handle.textContent = '@' + (profile.username || 'uye');
-  panel.appendChild(handle);
-
-  const bio = document.createElement('p');
-  bio.textContent = profile.bio || 'InSync üyesi';
-  panel.appendChild(bio);
-const divider = document.createElement('hr');
-divider.style.cssText = 'border:0;border-top:1px solid #e5e5e5;margin:24px 0;';
-panel.appendChild(divider);
-  const heading = document.createElement('h3');
-  heading.textContent = 'Paylaşımlar';
-  panel.appendChild(heading);
-
-  const userPosts = posts.filter(p => p.userId === userId);
-
-  if (!userPosts.length) {
-    const empty = document.createElement('p');
-    empty.textContent = 'Henüz paylaşım yok.';
-    panel.appendChild(empty);
-  } else {
-    userPosts.forEach(p => {
-      const item = document.createElement('div');
-      item.style.cssText = 'padding:15px 0;border-bottom:1px solid #ddd';
-      item.textContent = p.text || '';
-      panel.appendChild(item);
-    });
-  }
-}
-  function renderProfile(){photo=getProfile('photo','insyncProfilePhoto');$('profileName').textContent=displayName();$('profileHandle').textContent='@'+username();$('profileBio').textContent=getProfile('bio','insyncBio')||'InSync’te yeni insanlarla tanışıyor, öğreniyor ve paylaşıyorum.';['headerAvatar','composeAvatar','profileAvatar'].forEach(id=>avatar($(id)));$('myPosts').replaceChildren();const mine=posts.filter(p=>p.userId===user.uid);if(!mine.length)$('myPosts').append(el('p','muted','Henüz paylaşımın yok.'));else mine.forEach(p=>$('myPosts').append(postElement(p)))}
-function postElement(p){const root=el('article','post'),av=el('div','avatar',((p.username||'Üye').charAt(0)||'?').toUpperCase()),body=el('div','postbody'),head=el('div','posthead'),name=el('button','name',p.username||'Üye'),date=el('span','date',p.createdAt?.toDate?.()?.toLocaleDateString('tr-TR')||''),txt=el('div','posttext',p.text||''),actions=el('div','actions');name.type='button';
-if (p.userId) {
-  getDoc(doc(db, 'users', p.userId)).then(snap => {
-    const photo = snap.data()?.photo;
-    if (photo) {
-      av.textContent = '';
-      av.style.backgroundImage = `url("${photo}")`;
-      av.style.backgroundSize = 'cover';
-      av.style.backgroundPosition = 'center';
-    }
-  }).catch(console.error);
-}
-                        name.style.cursor='pointer';
-name.addEventListener('click',()=>{
-  if(p.userId===user.uid){
-    show('profile');
-  }else{
-  openUserProfile(p.userId);
-  }
-});head.append(name,date);const share=el('button','','↗ Paylaş');share.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(p.text||'');notify('Metin kopyalandı')}catch{notify('Kopyalanamadı')}});const like=el('button','','♡ Beğen');like.addEventListener('click',()=>{like.classList.toggle('liked');like.textContent=like.classList.contains('liked')?'♥ Beğenildi':'♡ Beğen'});const comment=el('button','','◯ Yanıtla');comment.addEventListener('click',()=>notify('Yanıtlar yakında eklenecek'));actions.append(like,comment,share);body.append(head,txt,actions);root.append(av,body);return root}
-function renderFeed(){const arr=filter==='mine'?posts.filter(p=>p.userId===user.uid):posts;$('feed').replaceChildren();$('feedStatus').textContent=arr.length?'':(filter==='mine'?'Henüz paylaşım yapmadın.':'Henüz paylaşım yok. İlk paylaşımı sen yap!');arr.forEach(p=>$('feed').append(postElement(p)));if(page==='profile')renderProfile()}
-function renderSearch(){const q=$('searchInput').value.toLocaleLowerCase('tr').trim(),box=$('searchResults');box.replaceChildren();rooms.filter(r=>(r.name+' '+r.desc).toLocaleLowerCase('tr').includes(q)).forEach(r=>box.append(roomElement(r)));posts.filter(p=>(p.text+' '+p.username).toLocaleLowerCase('tr').includes(q)).slice(0,30).forEach(p=>box.append(postElement(p)));if(!box.children.length)box.append(el('p','empty','Sonuç bulunamadı.'))}
-function roomElement(r){const item=el('div','room'),icon=el('div','emoji',r.icon),info=el('div','roominfo'),name=el('strong','',r.name),desc=el('small','',r.desc),btn=el('button','pill','Katıl');info.append(name,desc);item.append(icon,info,btn);btn.addEventListener('click',()=>openRoom(r));return item}
-function renderRooms(){$('roomList').replaceChildren(...rooms.map(roomElement))}
-function openRoom(r){room=r;stopChat?.();stopChat=null;$('chatTitle').textContent=r.icon+' '+r.name;$('chatDescription').textContent=r.desc;$('chatError').textContent='';$('messages').replaceChildren(el('p','muted','Mesajlar yükleniyor…'));show('chat');const q=query(collection(db,'rooms',r.id,'messages'),orderBy('createdAt','asc'),limit(100));stopChat=onSnapshot(q,snap=>{const list=snap.docs.map(d=>d.data());$('messages').replaceChildren();if(!list.length)$('messages').append(el('p','empty','Henüz mesaj yok. İlk mesajı sen yaz!'));list.forEach(m=>{const b=el('div','bubble');b.append(el('strong','',m.username||'Üye'),el('p','',m.text||''));$('messages').append(b)});$('messages').scrollTop=$('messages').scrollHeight},err=>{$('messages').replaceChildren();$('chatError').textContent='Mesajlar açılamadı. Firestore oda izinlerini kontrol et. ('+err.code+')'})}
-function startFeed(){stopPosts?.();const q=query(collection(db,'posts'),orderBy('createdAt','desc'),limit(100));stopPosts=onSnapshot(q,snap=>{posts=snap.docs.map(d=>({id:d.id,...d.data()}));renderFeed();if(page==='search')renderSearch()},err=>{$('feedStatus').textContent='Paylaşımlar yüklenemedi: '+err.code+'. Firestore kurallarını kontrol et.'})}
-$('authForm').addEventListener('submit',async e=>{e.preventDefault();$('authError').textContent='';try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authError').textContent='Giriş yapılamadı: '+err.code}});
-$('register').addEventListener('click',async()=>{$('authError').textContent='';try{await createUserWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authError').textContent='Üyelik oluşturulamadı: '+err.code}});
-
-onAuthStateChanged(auth, async u => {
-  user = u;
-  $('loading').style.display = 'none';
-  $('auth').hidden = !!u;
-  $('main').style.display = u ? 'block' : 'none';
-
-  if (stopPosts) {
-    stopPosts();
-    stopPosts = null;
-  }
-  if (stopChat) {
-    stopChat();
-    stopChat = null;
-  }
-
-  posts = [];
-
-  if (u) {
-    try {
-      const userRef = doc(db, 'users', u.uid);
-      const snap = await getDoc(userRef);
-
-      if (!snap.exists()) {
-        await setDoc(userRef, {
-          username: username(),
-          name: displayName(),
-          bio: 'InSync üyesi'
-        });
-      }
-    } catch (err) {
-      console.error('Profil oluşturulamadı:', err);
-    }
-
-    photo = getProfile('photo', 'insyncProfilePhoto');
-    renderProfile();
-    renderRooms();
-    show('home');
-    startFeed();
-  } else {
-    $('feed').replaceChildren();
-    $('password').value = '';
-  }
-});
-
-$('menu').addEventListener('click',()=>{$('menuPanel').hidden=!$('menuPanel').hidden});$('logout').addEventListener('click',async()=>{try{await signOut(auth);$('menuPanel').hidden=true}catch(err){notify('Çıkış yapılamadı: '+err.code)}});$('headerProfile').addEventListener('click',()=>show('profile'));document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));$('composerButton').addEventListener('click',()=>show('create'));$('composerPost').addEventListener('click',()=>show('create'));$('tabAll').addEventListener('click',()=>{filter='all';$('tabAll').classList.add('active');$('tabMine').classList.remove('active');renderFeed()});$('tabMine').addEventListener('click',()=>{filter='mine';$('tabMine').classList.add('active');$('tabAll').classList.remove('active');renderFeed()});$('searchInput').addEventListener('input',renderSearch);
-$('publish').addEventListener('click',async()=>{const text=$('postText').value.trim();if(!text)return;$('publish').disabled=true;$('postError').textContent='';try{await addDoc(collection(db,'posts'),{text,userId:user.uid,username:username(),createdAt:serverTimestamp()});$('postText').value='';show('home');notify('Paylaşım yayınlandı')}catch(err){$('postError').textContent='Paylaşılamadı: '+err.code}finally{$('publish').disabled=false}});
-$('chatForm').addEventListener('submit',async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text||!room)return;const currentRoom=room.id;const button=$('chatForm').querySelector('button');button.disabled=true;$('chatError').textContent='';try{await addDoc(collection(db,'rooms',currentRoom,'messages'),{text,userId:user.uid,username:username(),createdAt:serverTimestamp()});$('chatInput').value=''}catch(err){$('chatError').textContent='Mesaj gönderilemedi: '+err.code+'. Firestore kurallarını kontrol et.'}finally{button.disabled=false}});
-$('backRooms').addEventListener('click',()=>{stopChat?.();stopChat=null;show('rooms')});$('editProfile').addEventListener('click',()=>{$('editName').value=getProfile('name','insyncName')||displayName();$('editUsername').value=username();$('editBio').value=getProfile('bio','insyncBio');show('edit')});$('saveProfile').addEventListener('click',()=>{const n=$('editName').value.trim(),u=$('editUsername').value.trim().replace(/^@/,'');if(!n||!u){notify('Ad ve kullanıcı adı gerekli');return}localStorage.setItem(profileKey('name'),n);localStorage.setItem(profileKey('username'),u);localStorage.setItem(profileKey('bio'),$('editBio').value.trim());renderProfile();show('profile');notify('Profil bu cihazda kaydedildi')});$('editPhoto').addEventListener('change', async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  try {
-    const photoData = await compressProfilePhoto(file);
-
-    localStorage.setItem(profileKey('photo'), photoData);
-    renderProfile();
-
-    await savePhotoToFirestore(photoData);
-
-    notify('Profil fotoğrafı kaydedildi');
-  } catch (err) {
-    notify('Fotoğraf kaydedilemedi: ' + err.message);
-  }
-});
-async function savePhotoToFirestore(photoData) {
-  if (!user) return;
-  await setDoc(
-    doc(db, 'users', user.uid),
-    { photo: photoData },
-    { merge: true }
-  );
-}
-  function compressProfilePhoto(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 160;
-      canvas.height = 160;
-
-      const ctx = canvas.getContext('2d');
-      const side = Math.min(img.width, img.height);
-      const x = (img.width - side) / 2;
-      const y = (img.height - side) / 2;
-
-      ctx.drawImage(img, x, y, side, side, 0, 0, 160, 160);
-      URL.revokeObjectURL(url);
-
-      resolve(canvas.toDataURL('image/jpeg', 0.65));
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Fotoğraf okunamadı'));
-    };
-
-    img.src = url;
-  });
-}
+onAuthStateChanged(auth,async u=>{
+ Object.values(stop).forEach(f=>f?.());stop={};user=u;posts=[];
+ $('loading').hidden=true;$('auth').hidden=!!u;$('app').hidden=!u;
+ if(!u){users.clear();me={};$('password').value='';return}
+ const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
+ try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
+ users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed()});
 </script></body></html>
