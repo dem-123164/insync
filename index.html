@@ -1100,7 +1100,10 @@ function publishPost() {
     const input = document.getElementById("postInput");
 
     if (input.value.trim() === "") return;
-
+window.savePostToFirebase(input.value.trim())
+  .catch(error => {
+    alert("Firebase kayıt hatası: " + error.code);
+  });
     const newPost = document.createElement("div");
     newPost.className = "post";
 
@@ -1348,7 +1351,15 @@ function openNotifications() {
   signInWithEmailAndPassword,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+   import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  onSnapshot,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -1369,6 +1380,21 @@ function openNotifications() {
     const auth = getAuth(app);
 const db = getFirestore(app);
 window.insyncDB = db;
+    window.savePostToFirebase = async function(text) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Paylaşım yapmak için giriş yapmalısın.");
+    return;
+  }
+
+  await addDoc(collection(db, "posts"), {
+    text: text,
+    userId: user.uid,
+    username: localStorage.getItem("insyncUsername") || "Üye",
+    createdAt: serverTimestamp()
+  });
+};
 window.registerUser = async function() {
   const email = document.getElementById("authEmail").value.trim();
   const password = document.getElementById("authPassword").value;
