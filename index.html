@@ -260,7 +260,33 @@ nav {
 </head>
 
 <body>
+<div id="authPage" style="display:none; max-width:380px; margin:70px auto; padding:25px; text-align:center; font-family:Arial;">
 
+  <h1>InSync</h1>
+  <h2>Hoş geldin</h2>
+
+  <input id="authEmail" type="email"
+    placeholder="E-posta adresin"
+    autocomplete="email"
+    style="width:100%; padding:14px; margin:8px 0;">
+
+  <input id="authPassword" type="password"
+    placeholder="Şifren"
+    autocomplete="current-password"
+    style="width:100%; padding:14px; margin:8px 0;">
+
+  <button type="button" onclick="loginUser()"
+    style="padding:12px; margin:8px;">
+    Giriş Yap
+  </button>
+
+  <button type="button" onclick="registerUser()"
+    style="padding:12px; margin:8px;">
+    Üye Ol
+  </button>
+
+  <p id="authMessage"></p>
+</div>
 <!-- GİRİŞ -->
 
 <div id="splash" onclick="openApp()">
@@ -1316,6 +1342,12 @@ function openNotifications() {
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js";
+    import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -1333,6 +1365,48 @@ function openNotifications() {
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+window.registerUser = async function() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const message = document.getElementById("authMessage");
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    message.textContent = "Üyelik başarılı!";
+  } catch (error) {
+    message.textContent = "Üyelik başarısız: " + error.code;
+  }
+};
+
+window.loginUser = async function() {
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const message = document.getElementById("authMessage");
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    message.textContent = "Giriş başarılı!";
+  } catch (error) {
+    message.textContent = "Giriş başarısız: " + error.code;
+  }
+};
+  onAuthStateChanged(auth, function(user) {
+  const authPage = document.getElementById("authPage");
+  const splash = document.getElementById("splash");
+  const appPage = document.getElementById("app");
+
+  if (user) {
+    authPage.style.display = "none";
+    splash.style.display = "none";
+    appPage.style.display = "block";
+  } else {
+    authPage.style.display = "block";
+    splash.style.display = "none";
+    appPage.style.display = "none";
+  }
+});
   const analytics = getAnalytics(app);
 </script>
 </body>
