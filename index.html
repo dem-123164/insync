@@ -16,7 +16,7 @@
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
 import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
+import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,setDoc}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'};
 const firebase=initializeApp(firebaseConfig),auth=getAuth(firebase),db=getFirestore(firebase),$=id=>document.getElementById(id);
 const rooms=[{id:'almanca-a1',icon:'🇩🇪',name:'Almanca A1',desc:'Temel Almanca konuşma pratiği'},{id:'almanca-a2',icon:'🇩🇪',name:'Almanca A2',desc:'Günlük hayatta Almanca'},{id:'almanca-b1',icon:'🇩🇪',name:'Almanca B1',desc:'Daha akıcı konuşmalar'},{id:'muzik',icon:'🎵',name:'Müzik ve Beste',desc:'Müzisyenler, şarkılar, üretim'},{id:'kitap',icon:'📚',name:'Kitap ve Edebiyat',desc:'Okuduklarımız üzerine sohbet'},{id:'felsefe',icon:'💭',name:'Felsefe',desc:'Fikirler ve düşünceler'}];
@@ -97,7 +97,51 @@ function openRoom(r){room=r;stopChat?.();stopChat=null;$('chatTitle').textConten
 function startFeed(){stopPosts?.();const q=query(collection(db,'posts'),orderBy('createdAt','desc'),limit(100));stopPosts=onSnapshot(q,snap=>{posts=snap.docs.map(d=>({id:d.id,...d.data()}));renderFeed();if(page==='search')renderSearch()},err=>{$('feedStatus').textContent='Paylaşımlar yüklenemedi: '+err.code+'. Firestore kurallarını kontrol et.'})}
 $('authForm').addEventListener('submit',async e=>{e.preventDefault();$('authError').textContent='';try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authError').textContent='Giriş yapılamadı: '+err.code}});
 $('register').addEventListener('click',async()=>{$('authError').textContent='';try{await createUserWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authError').textContent='Üyelik oluşturulamadı: '+err.code}});
-onAuthStateChanged(auth,u=>{user=u;$('loading').style.display='none';$('auth').hidden=!!u;$('main').style.display=u?'block':'none';if(stopPosts){stopPosts();stopPosts=null}if(stopChat){stopChat();stopChat=null}posts=[];if(u){photo=getProfile('photo','insyncProfilePhoto');renderProfile();renderRooms();show('home');startFeed()}else{$('feed').replaceChildren();$('password').value=''}});
+
+onAuthStateChanged(auth, async u => {
+  user = u;
+  $('loading').style.display = 'none';
+  $('auth').hidden = !!u;
+  $('main').style.display = u ? 'block' : 'none';
+
+  if (stopPosts) {
+    stopPosts();
+    stopPosts = null;
+  }
+  if (stopChat) {
+    stopChat();
+    stopChat = null;
+  }
+
+  posts = [];
+
+  if (u) {
+    try {
+      const userRef = doc(db, 'users', u.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          username: username(),
+          name: displayName(),
+          bio: 'InSync üyesi'
+        });
+      }
+    } catch (err) {
+      console.error('Profil oluşturulamadı:', err);
+    }
+
+    photo = getProfile('photo', 'insyncProfilePhoto');
+    renderProfile();
+    renderRooms();
+    show('home');
+    startFeed();
+  } else {
+    $('feed').replaceChildren();
+    $('password').value = '';
+  }
+});
+
 $('menu').addEventListener('click',()=>{$('menuPanel').hidden=!$('menuPanel').hidden});$('logout').addEventListener('click',async()=>{try{await signOut(auth);$('menuPanel').hidden=true}catch(err){notify('Çıkış yapılamadı: '+err.code)}});$('headerProfile').addEventListener('click',()=>show('profile'));document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));$('composerButton').addEventListener('click',()=>show('create'));$('composerPost').addEventListener('click',()=>show('create'));$('tabAll').addEventListener('click',()=>{filter='all';$('tabAll').classList.add('active');$('tabMine').classList.remove('active');renderFeed()});$('tabMine').addEventListener('click',()=>{filter='mine';$('tabMine').classList.add('active');$('tabAll').classList.remove('active');renderFeed()});$('searchInput').addEventListener('input',renderSearch);
 $('publish').addEventListener('click',async()=>{const text=$('postText').value.trim();if(!text)return;$('publish').disabled=true;$('postError').textContent='';try{await addDoc(collection(db,'posts'),{text,userId:user.uid,username:username(),createdAt:serverTimestamp()});$('postText').value='';show('home');notify('Paylaşım yayınlandı')}catch(err){$('postError').textContent='Paylaşılamadı: '+err.code}finally{$('publish').disabled=false}});
 $('chatForm').addEventListener('submit',async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text||!room)return;const currentRoom=room.id;const button=$('chatForm').querySelector('button');button.disabled=true;$('chatError').textContent='';try{await addDoc(collection(db,'rooms',currentRoom,'messages'),{text,userId:user.uid,username:username(),createdAt:serverTimestamp()});$('chatInput').value=''}catch(err){$('chatError').textContent='Mesaj gönderilemedi: '+err.code+'. Firestore kurallarını kontrol et.'}finally{button.disabled=false}});
