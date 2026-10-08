@@ -302,9 +302,20 @@ nav {
   <div class="logo">InSync</div>
 
 <div onclick="openMyProfile()" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; align-items:center; cursor:pointer; gap:4px;">
-  <div id="headerAvatar" style="width:36px; height:36px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center;">H</div>
+  <div id="headerAvatar<button
+  type="button"
+  onclick="logoutUser()"
+  style="position:absolute; left:15px; top:50%;
+  transform:translateY(-50%);
+  background:transparent; color:inherit;
+  border:1px solid #888; border-radius:15px;
+  padding:6px 10px; cursor:pointer;
+  font-size:12px;">
+  Çıkış Yap
+</button>" style="width:36px; height:36px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center;">H</div>
   <div id="headerUsername" style="font-size:11px;">Profil</div>
 </div>
+    
 </header>
 
 <div class="post">
@@ -1348,8 +1359,9 @@ function openNotifications() {
     import {
   getAuth,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged
+ signInWithEmailAndPassword,
+onAuthStateChanged,
+signOut
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
    import {
   getFirestore,
@@ -1435,6 +1447,14 @@ window.loginUser = async function() {
     appPage.style.display = "none";
   }
 });
+    window.logoutUser = async function() {
+  try {
+    await signOut(auth);
+    window.location.reload();
+  } catch (error) {
+    alert("Çıkış yapılamadı: " + error.message);
+  }
+};
   const analytics = getAnalytics(app);
 </script>
 </body>
