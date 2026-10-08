@@ -23,7 +23,7 @@ const rooms=[{id:'almanca-a1',icon:'🇩🇪',name:'Almanca A1',desc:'Temel Alma
 let user=null,posts=[],filter='all',page='home',room=null,stopPosts=null,stopChat=null,photo='';
 const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n};
 function notify(message){$('toast').textContent=message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3500)}
-function profileKey(key){return 'insync:'+user.uid+':'+key}function getProfile(key,legacy){return localStorage.getItem(profileKey(key))||localStorage.getItem(legacy)||''}
+function profileKey(key){return 'insync:'+user.uid+':'+key}function getProfile(key,legacy){return localStorage.getItem(profileKey(key))||''}
 function username(){return getProfile('username','insyncUsername').replace(/^@/,'')||user.email.split('@')[0]}
 function displayName(){return getProfile('name','insyncName')||username()}
 function avatar(target,letter){target.textContent=(letter||displayName()).charAt(0).toUpperCase();target.style.backgroundImage=photo?`url(${JSON.stringify(photo)})`:'';if(photo)target.textContent=''}
