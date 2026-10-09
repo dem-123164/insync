@@ -96,7 +96,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
   <p class="mut">İki kişi, 10 soru, Almanca bilgi yarışması.</p>
   <div id="duelLobby"><label class="lbl" for="duelLevel">Seviye</label>
    <select id="duelLevel" class="field"><option>A1</option><option>A2</option><option>B1</option></select>
-   <label class="lbl" for="duelSeconds">Soru başına süre</label><select id="duelSeconds" class="field"><option value="10">10 saniye</option><option value="15">15 saniye</option><option value="20" selected>20 saniye</option><option value="30">30 saniye</option></select><button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
+   <label class="lbl" for="duelSeconds">10 soru için toplam süre</label><select id="duelSeconds" class="field"><option value="60">1 dakika</option><option value="180" selected>3 dakika</option><option value="300">5 dakika</option></select><button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
   <div id="duelGame" hidden><div id="duelStatus" class="mut"></div>
    <div id="duelScores" class="duel-score"></div><div id="duelQuestion"></div>
    <button class="pill" id="duelLeave" style="margin-top:18px">Odadan çık</button></div>
@@ -289,7 +289,7 @@ const DUEL_Q={
 };
 let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0,duelClock=null,duelSaving=false;
 function openDuel(){go('duel');if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
-function duelReset(){clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
+function duelReset(){clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
 $('duelBack').onclick=()=>go('rooms');
 $('duelLeave').onclick=()=>{duelReset();go('rooms')};
 $('duelFind').onclick=async()=>{
@@ -341,29 +341,24 @@ function renderDuel(){
  const score=uid=>duelAnswers.filter(a=>a.uid===uid&&qs[a.q]&&a.choice===qs[a.q][2]).length*10;
  $('duelScores').replaceChildren(el('div','',`${d.hostName}: ${score(d.host)} puan`),el('div','',`${d.guestName||'Rakip bekleniyor…'}: ${d.guest?score(d.guest):'—'} puan`));
  const area=$('duelQuestion');area.replaceChildren();
- if(d.status==='waiting'||!d.guest){$('duelStatus').textContent=`Rakip bekleniyor… ${d.seconds||20} saniyelik düello. Diğer oyuncu aynı seviyeyi seçerek katılabilir.`;area.append(el('p','mut','Oyun rakip katılınca başlar.'));return}
- const seconds=Number(d.seconds)||20,started=Number(d.startedAt)||Date.now();
- const elapsed=Math.max(0,Date.now()-started),slot=Math.min(10,Math.floor(elapsed/(seconds*1000)));
- // Geçmiş sorulara cevap verilmediyse süre dolmuş olarak kaydet; böylece maç daima bitebilir.
- const missing=Array.from({length:slot},(_,i)=>i).find(i=>!my.some(a=>a.q===i));
- if(missing!==undefined){$('duelStatus').textContent='Süre doldu · Cevap kaydediliyor…';if(!duelBusy)answerDuel(missing,-1);return}
- if(slot>=10){
-  const pending=Array.from({length:10},(_,i)=>i).find(i=>!my.some(a=>a.q===i));
-  if(pending!==undefined){$('duelStatus').textContent='Düello bitiyor, sonuçlar kaydediliyor…';if(!duelBusy)answerDuel(pending,-1);return}
+ if(d.status==='waiting'||!d.guest){$('duelStatus').textContent=`Rakip bekleniyor… ${Math.round((d.seconds||180)/60)} dakikalık düello. Diğer oyuncu aynı seviyeyi seçerek katılabilir.`;area.append(el('p','mut','Oyun rakip katılınca başlar.'));return}
+ const seconds=[60,180,300].includes(Number(d.seconds))?Number(d.seconds):180;
+ const started=Number(d.startedAt)||Date.now();
+ const remaining=Math.max(0,Math.ceil((started+seconds*1000-Date.now())/1000));
+ const next=Array.from({length:10},(_,i)=>i).find(i=>!my.some(a=>a.q===i));
+ if(remaining===0||next===undefined){
   const mine=score(user.uid),other=score(d.host===user.uid?d.guest:d.host);
   $('duelStatus').textContent='Düello tamamlandı!';
   area.append(el('h3','',mine===other?'Berabere!':mine>other?'Kazandın! 🎉':'Rakibin kazandı!'));
-  area.append(el('p','',`${mine} puan · Profiline kaydediliyor…`));
-  if(savedDuelAttempts.has(user.uid+'_'+duelId))area.lastChild.textContent=`${mine} puan · Profiline kaydedildi ✓`;
+  const status=el('p','',`${mine} puan · Profiline kaydediliyor…`);area.append(status);
+  if(savedDuelAttempts.has(user.uid+'_'+duelId))status.textContent=`${mine} puan · Profiline kaydedildi ✓`;
   else if(!duelSaving)finishDuel(duelId,mine,d.level);
   const b=el('button','pill pri','Tekrar oyna');b.onclick=()=>{duelReset();openDuel()};area.append(b);return;
  }
- const next=slot,remaining=Math.max(0,Math.ceil((seconds*1000-(elapsed%(seconds*1000)))/1000));
- const myAnswer=my.find(a=>a.q===next);
- $('duelStatus').textContent=`${d.level} · Soru ${next+1}/10 · ⏱ ${remaining} sn · Doğru cevap 10 puan`;
+ const min=Math.floor(remaining/60),sec=String(remaining%60).padStart(2,'0');
+ $('duelStatus').textContent=`${d.level} · Soru ${next+1}/10 · ⏱ ${min}:${sec} toplam süre · Doğru cevap 10 puan`;
  const q=qs[next];area.append(el('h3','',q[0]));
- if(myAnswer){area.append(el('p','mut','Cevabın alındı. Sonraki soru bekleniyor…'));return}
- q[1].forEach((choice,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${choice}`);b.onclick=()=>{if(duelBusy)return;area.querySelectorAll('button').forEach(x=>x.disabled=true);answerDuel(next,i)};area.append(b)});
+ q[1].forEach((choice,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${choice}`);b.onclick=()=>{if(duelBusy||Date.now()>=started+seconds*1000)return;area.querySelectorAll('button').forEach(x=>x.disabled=true);answerDuel(next,i)};area.append(b)});
 }
 
 /* ---------- Keşfet, takip ve hareketler ---------- */
