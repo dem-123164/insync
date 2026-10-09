@@ -47,7 +47,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 .duel-option{display:block;width:100%;text-align:left;padding:13px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--soft)}
 .duel-option:disabled{opacity:.75}.duel-option.selected{border:2px solid var(--fg)}
 .duel-score{display:flex;justify-content:space-between;gap:10px;padding:14px;background:var(--soft);border-radius:14px;margin:12px 0}
-.hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.hero h2{margin:0}
+.usercard{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.usercard .info{flex:1;min-width:0}.profile-meta{display:flex;gap:18px;margin:10px 0 16px}.score-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}.bottom button{flex:1;min-width:0;padding:12px 4px}.hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.hero h2{margin:0}
 :focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 </style></head><body>
 <div class="shell">
@@ -78,7 +78,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 </section>
 
 <section class="page" id="p-search"><div class="sec"><h2>Keşfet</h2>
- <input class="field" id="q" placeholder="Paylaşımlarda veya odalarda ara…"><div id="results"></div></div></section>
+ <input class="field" id="q" placeholder="Kullanıcı adı veya isim ara…"><div id="results"></div></div></section>
 
 <section class="page" id="p-create"><div class="sec"><h2>Yeni paylaşım</h2>
  <textarea class="field" id="postText" rows="6" maxlength="2000" placeholder="Ne paylaşmak istiyorsun?"></textarea>
@@ -113,9 +113,10 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
  <form class="bar" id="replyForm"><input id="replyInput" maxlength="1000" placeholder="Yanıt yaz…" autocomplete="off" required><button class="pill pri" type="submit">Yanıtla</button></form>
 </section>
 
+<section class="page" id="p-activity"><div class="sec"><h2>Hareketler</h2><div id="activityList" class="mut">Bildirimler yükleniyor…</div></div></section>
 <section class="page" id="p-profile"><div class="sec">
  <div class="hero"><div><h2 id="pName"></h2><div class="mut" id="pHandle"></div></div><div class="avatar lg" id="pAv"></div></div>
- <p id="pBio"></p><button class="pill" id="editBtn">Profili düzenle</button>
+ <div class="profile-meta"><button id="followersBtn" class="mut">0 takipçi</button><button id="followingBtn" class="mut">0 takip edilen</button></div><button class="pill" id="followBtn" hidden>Takip et</button><p id="pBio"></p><button class="pill" id="editBtn">Profili düzenle</button><details style="margin:18px 0;border-block:1px solid var(--line);padding:14px 0"><summary style="cursor:pointer;font-weight:700">🏆 Dil Puanlarım</summary><div id="languageScores" style="padding-top:10px"></div></details>
  <h3 style="margin:26px 0 0">Paylaşımlar</h3></div><div id="pPosts"></div></section>
 
 <section class="page" id="p-edit"><div class="sec"><h2>Profili düzenle</h2>
@@ -127,7 +128,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 
 <nav class="bottom" aria-label="Ana menü">
  <button data-go="home" class="active" aria-label="Ana akış">⌂</button><button data-go="search" aria-label="Ara">⌕</button>
- <button data-go="create" aria-label="Yeni paylaşım" style="font-size:29px">＋</button><button data-go="rooms" aria-label="Sohbet odaları">♧</button><button data-go="profile" aria-label="Profilim">◎</button>
+ <button data-go="rooms" aria-label="Sohbet odaları ve düellolar" style="font-size:29px">＋</button><button data-go="activity" aria-label="Hareketler">♡</button><button data-go="profile" aria-label="Profilim">♙</button>
 </nav>
 </div></div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -135,7 +136,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
 import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment,where,runTransaction}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
+import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment,where,runTransaction}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
 const app=initializeApp({apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'});
 const auth=getAuth(app),db=getFirestore(app);
@@ -177,7 +178,7 @@ function paintMe(){['meAv','compAv'].forEach(id=>paint($(id),me,handle()))}
 function go(n){if(page==='chat'&&n!=='chat')leaveRoomPresence();page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
  const nav={chat:'rooms',duel:'rooms',thread:'home',edit:'profile'}[n]||n;
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===nav));scrollTo(0,0);
- if(n==='search')renderSearch();if(n==='rooms')renderRooms()}
+ if(n==='search')renderSearch();if(n==='rooms')renderRooms();if(n==='activity')renderActivity()}
 
 /* ---------- Paylaşımlar ---------- */
 function postEl(p){
@@ -188,9 +189,9 @@ function postEl(p){
  if(p.topic&&p.topic!=='genel')h.append(el('span','chip',TOPICS[p.topic]||p.topic));
  const likes=p.likes||[],liked=likes.includes(user.uid),acts=el('div','acts');
  const lk=el('button',liked?'on':'',(liked?'♥ ':'♡ ')+(likes.length||'Beğen'));
- lk.onclick=()=>updateDoc(doc(db,'posts',p.id),{likes:liked?arrayRemove(user.uid):arrayUnion(user.uid)}).catch(e=>toast(msg(e)));
+ lk.onclick=async()=>{try{await updateDoc(doc(db,'posts',p.id),{likes:liked?arrayRemove(user.uid):arrayUnion(user.uid)});if(!liked&&p.userId!==user.uid)await notify(p.userId,'like',p.id)}catch(e){toast(msg(e))}};
  const rp=el('button','','◯ '+(p.replyCount?p.replyCount+' yanıt':'Yanıtla'));rp.onclick=()=>openThread(p.id);
- const sh=el('button','','↗ Paylaş');sh.onclick=async()=>{const url=location.origin+location.pathname+'#post-'+encodeURIComponent(p.id);try{if(navigator.share)await navigator.share({title:'InSync paylaşımı',text:p.text||'',url});else{await navigator.clipboard.writeText(url);toast('Paylaşım bağlantısı kopyalandı')}}catch(e){if(e.name!=='AbortError')toast('Paylaşılamadı')}};
+ const sh=el('button','','↗ Paylaş');sh.onclick=async()=>{const url=location.origin+location.pathname+'#post-'+encodeURIComponent(p.id);try{await navigator.clipboard.writeText(url);toast('Bağlantı kopyalandı. İstediğin uygulamada paylaşabilirsin.')}catch(e){prompt('Paylaşım bağlantısını kopyala:',url)}};
  acts.append(lk,rp,sh);
  if(p.userId===user.uid){const d=el('button','','Sil');d.onclick=async()=>{if(!confirm('Bu paylaşım silinsin mi?'))return;try{await deleteDoc(doc(db,'posts',p.id));if(page==='thread')go('home')}catch(e){toast(msg(e))}};acts.append(d)}
  b.append(h,el('div','txt',p.text||''),acts);r.append(av,b);return r}
@@ -211,7 +212,7 @@ function openThread(id){threadId=id;stop.rep?.();$('replies').replaceChildren();
 function renderThread(){const p=posts.find(x=>x.id===threadId);$('threadPost').replaceChildren(p?postEl(p):el('p','empty','Bu paylaşım bulunamadı.'))}
 $('replyForm').onsubmit=async e=>{e.preventDefault();const t=$('replyInput').value.trim();if(!t||!threadId)return;
  try{await addDoc(collection(db,'posts',threadId,'replies'),{text:t,userId:user.uid,username:handle(),createdAt:serverTimestamp()});
-  await updateDoc(doc(db,'posts',threadId),{replyCount:increment(1)});$('replyInput').value=''}catch(err){toast(msg(err))}};
+  await updateDoc(doc(db,'posts',threadId),{replyCount:increment(1)});const original=posts.find(p=>p.id===threadId);if(original&&original.userId!==user.uid)await notify(original.userId,'comment',threadId);$('replyInput').value=''}catch(err){toast(msg(err))}};
 $('backHome').onclick=()=>{stop.rep?.();go('home')};
 
 /* ---------- Odalar ---------- */
@@ -310,6 +311,8 @@ $('duelFind').onclick=async()=>{
   duelAnswerStop=onSnapshot(collection(db,'duels',duelId,'answers'),s=>{duelAnswers=s.docs.map(x=>x.data());renderDuel()},e=>toast(msg(e)));
  }catch(e){toast(msg(e));$('duelFind').disabled=false}finally{duelBusy=false}
 };
+const savedDuelAttempts=new Set();
+async function saveDuelResult(id,points){if(!id||!user||savedDuelAttempts.has(user.uid+id))return;savedDuelAttempts.add(user.uid+id);try{await setDoc(doc(db,'users',user.uid,'duelResults',id),{points,language:'almanca',level:duelState.level,createdAt:serverTimestamp()})}catch(e){console.warn('Puan kaydedilemedi',e)}}
 function renderDuel(){if(!duelState||!duelId)return;
  const d=duelState,qs=DUEL_Q[d.level],participants=[d.host,d.guest].filter(Boolean),my=duelAnswers.filter(a=>a.uid===user.uid),their=duelAnswers.filter(a=>a.uid!==user.uid);
  const score=uid=>duelAnswers.filter(a=>a.uid===uid&&qs[a.q]&&a.choice===qs[a.q][2]).length*10;
@@ -318,7 +321,7 @@ function renderDuel(){if(!duelState||!duelId)return;
  if(d.status==='waiting'||!d.guest){$('duelStatus').textContent='Rakip bekleniyor… Başka bir üye Almanca Düello odasına girip aynı seviyeyi seçmeli.';area.append(el('p','mut','Bu sayfayı açık tutabilirsin.'));return}
  const next=Array.from({length:10},(_,i)=>i).find(i=>!my.some(a=>a.q===i));
  if(next===undefined){$('duelStatus').textContent=their.length===10?'Düello tamamlandı!':'Soruların bitti. Rakibin bekleniyor…';
-  if(their.length===10){const mine=score(user.uid),other=score(participants.find(x=>x!==user.uid));area.append(el('h3','',mine===other?'Berabere!':mine>other?'Kazandın! 🎉':'Rakibin kazandı!'));const b=el('button','pill pri','Tekrar oyna');b.onclick=()=>{duelReset();openDuel()};area.append(b)}return}
+  if(their.length===10){saveDuelResult(duelId,score(user.uid));const mine=score(user.uid),other=score(participants.find(x=>x!==user.uid));area.append(el('h3','',mine===other?'Berabere!':mine>other?'Kazandın! 🎉':'Rakibin kazandı!'));const b=el('button','pill pri','Tekrar oyna');b.onclick=()=>{duelReset();openDuel()};area.append(b)}return}
  $('duelStatus').textContent=`${d.level} · Soru ${next+1}/10 · Doğru cevap 10 puan`;
  const q=qs[next];area.append(el('h3','',q[0]));
  q[1].forEach((choice,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${choice}`);b.onclick=async()=>{
@@ -328,20 +331,42 @@ function renderDuel(){if(!duelState||!duelId)return;
  };area.append(b)});
 }
 
-/* ---------- Arama ---------- */
-function renderSearch(){const q=$('q').value.toLocaleLowerCase('tr').trim(),box=$('results');
- const rs=ROOMS.filter(r=>(r.n+' '+r.d).toLocaleLowerCase('tr').includes(q)).map(roomEl);
- const ps=posts.filter(p=>((p.text||'')+' '+(p.username||'')).toLocaleLowerCase('tr').includes(q)).slice(0,30).map(postEl);
- box.replaceChildren(...rs,...ps);if(!box.children.length)box.append(el('p','empty','Sonuç bulunamadı.'))}
+/* ---------- Keşfet, takip ve hareketler ---------- */
+let directory=[],following=new Set(),followUnsub=null,activityUnsub=null;
+const profileLabel=u=>u.name||u.username||'InSync üyesi';
+async function notify(to,type,postId=''){
+ if(!to||to===user.uid)return;
+ try{await addDoc(collection(db,'users',to,'notifications'),{from:user.uid,fromName:profileLabel(me),type,postId,createdAt:serverTimestamp()})}catch(e){console.warn('Bildirim kaydedilemedi',e)}
+}
+function watchFollowing(){followUnsub?.();followUnsub=onSnapshot(collection(db,'users',user.uid,'following'),snap=>{following=new Set(snap.docs.map(d=>d.id));if(page==='search')renderSearch();if(page==='profile')renderProfile()},e=>console.warn(e))}
+function userCard(uid,u){const r=el('div','usercard'),av=el('button','avatar'),info=el('div','info'),name=el('button','name',profileLabel(u)),handleEl=el('div','mut','@'+(u.username||'uye'));
+ paint(av,u);av.onclick=name.onclick=()=>openProfile(uid);info.append(name,handleEl);r.append(av,info);
+ if(uid!==user.uid){const btn=el('button','pill',following.has(uid)?'Takiptesin':'Takip et');btn.onclick=()=>toggleFollow(uid,btn);r.append(btn)}return r}
+async function toggleFollow(uid,btn){if(!uid||uid===user.uid)return;btn.disabled=true;try{const followed=following.has(uid);const a=doc(db,'users',user.uid,'following',uid),b=doc(db,'users',uid,'followers',user.uid);
+ if(followed){await deleteDoc(a);await deleteDoc(b)}else{await setDoc(a,{uid,createdAt:serverTimestamp()});await setDoc(b,{uid:user.uid,createdAt:serverTimestamp()});await notify(uid,'follow')}
+ following[followed?'delete':'add'](uid);if(page==='search')renderSearch();if(page==='profile')renderProfile()
+ }catch(e){toast(msg(e))}finally{btn.disabled=false}}
+function startDirectory(){stop.directory?.();stop.directory=onSnapshot(collection(db,'users'),snap=>{directory=snap.docs.map(d=>({uid:d.id,...d.data()}));if(page==='search')renderSearch()},e=>console.warn(e))}
+function renderSearch(){const q=$('q').value.toLocaleLowerCase('tr').trim(),box=$('results');const arr=directory.filter(u=>((u.name||'')+' '+(u.username||'')).toLocaleLowerCase('tr').includes(q)).sort((a,b)=>(a.uid===user.uid)-(b.uid===user.uid));box.replaceChildren(...arr.map(u=>userCard(u.uid,u)));if(!arr.length)box.append(el('p','empty','Kullanıcı bulunamadı.'))}
 $('q').oninput=renderSearch;
-
+function renderActivity(){activityUnsub?.();activityUnsub=onSnapshot(query(collection(db,'users',user.uid,'notifications'),orderBy('createdAt','desc'),limit(80)),snap=>{const box=$('activityList');box.replaceChildren();if(snap.empty){box.append(el('p','empty','Henüz hareket yok.'));return}snap.forEach(d=>{const n=d.data(),row=el('div','usercard'),b=el('button','',`${n.fromName||'Bir kullanıcı'} ${n.type==='like'?'paylaşımını beğendi ❤️':n.type==='comment'?'paylaşımına yorum yaptı 💬':'seni takip etmeye başladı 👤'}`);b.style.textAlign='left';b.onclick=()=>{if(n.postId&&posts.some(p=>p.id===n.postId))openThread(n.postId);else openProfile(n.from)};row.append(b);box.append(row)})},e=>$('activityList').textContent=msg(e))}
 /* ---------- Profil ---------- */
 function openProfile(uid){viewUid=uid;go('profile');renderProfile()}
 async function renderProfile(){const uid=viewUid||user.uid,own=uid===user.uid,u=own?me:await getUser(uid);
- $('pName').textContent=u.name||u.username||'InSync üyesi';$('pHandle').textContent='@'+(u.username||'uye');
- $('pBio').textContent=u.bio||'Henüz bir şey yazılmamış.';$('editBtn').hidden=!own;paint($('pAv'),u);
- const mine=posts.filter(p=>p.userId===uid);
- $('pPosts').replaceChildren(...(mine.length?mine.map(postEl):[el('p','empty','Henüz paylaşım yok.')]))}
+ if(page!=='profile'||(viewUid||user.uid)!==uid)return;
+ $('pName').textContent=profileLabel(u);$('pHandle').textContent='@'+(u.username||'uye');$('pBio').textContent=u.bio||'Henüz bir şey yazılmamış.';$('editBtn').hidden=!own;paint($('pAv'),u);
+ const fb=$('followBtn');fb.hidden=own;if(!own){fb.textContent=following.has(uid)?'Takiptesin':'Takip et';fb.onclick=()=>toggleFollow(uid,fb)}
+ const [followersSnap,followingSnap]=await Promise.all([getDocs(collection(db,'users',uid,'followers')),getDocs(collection(db,'users',uid,'following'))]);
+ if(page!=='profile'||(viewUid||user.uid)!==uid)return;
+ $('followersBtn').textContent=followersSnap.size+' takipçi';$('followingBtn').textContent=followingSnap.size+' takip edilen';
+ $('followersBtn').onclick=()=>showPeople(followersSnap.docs.map(d=>d.id),'Takipçiler');$('followingBtn').onclick=()=>showPeople(followingSnap.docs.map(d=>d.id),'Takip edilenler');
+ const mine=posts.filter(p=>p.userId===uid);$('pPosts').replaceChildren(...(mine.length?mine.map(postEl):[el('p','empty','Henüz paylaşım yok.')]));
+ const scores=$('languageScores');scores.replaceChildren();let german=0;
+ try{const ss=await getDocs(collection(db,'users',uid,'duelResults'));ss.forEach(d=>{german+=Number(d.data().points)||0})}catch(e){console.warn(e)}
+ const languages=[['🇩🇪','Almanca','A1',german],['🇬🇧','İngilizce','—',0],['🇪🇸','İspanyolca','—',0],['🇫🇷','Fransızca','—',0],['🇯🇵','Japonca','—',0]];
+ languages.forEach(([flag,lang,level,points])=>{const r=el('div','score-row');r.append(el('span','',flag+' '+lang),el('span','',level+' · '+points+' puan'));scores.append(r)})
+}
+async function showPeople(ids,title){go('search');$('q').value='';const box=$('results');box.replaceChildren(el('h3','',title));for(const uid of ids){const u=await getUser(uid);box.append(userCard(uid,u))}if(!ids.length)box.append(el('p','empty','Henüz kimse yok.'))}
 $('editBtn').onclick=()=>{$('eName').value=me.name||'';$('eUser').value=me.username||'';$('eBio').value=me.bio||'';$('ePhoto').value='';go('edit')};
 function squarePhoto(file){return new Promise((ok,no)=>{const img=new Image(),url=URL.createObjectURL(file);
  img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const s=Math.min(img.width,img.height);
@@ -370,10 +395,10 @@ $('fake').onclick=$('fakeBtn').onclick=()=>go('create');
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
 
 onAuthStateChanged(auth,async u=>{
- Object.values(stop).forEach(f=>f?.());stop={};duelReset();user=u;posts=[];
+ Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();duelReset();user=u;posts=[];
  $('loading').hidden=true;$('auth').hidden=!!u;$('app').hidden=!u;
  if(!u){users.clear();me={};$('password').value='';return}
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
  try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
- users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed()});
+ users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing()});
 </script></body></html>
