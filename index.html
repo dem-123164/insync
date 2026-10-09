@@ -44,6 +44,9 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 .auth{max-width:380px;margin:12vh auto;padding:24px}.auth h1{font-size:44px;letter-spacing:-2px;margin:0 0 6px}
 .err{color:var(--red);font-size:14px;min-height:20px}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#222;color:#fff;border-radius:12px;padding:11px 16px;z-index:20;max-width:90%}
+.duel-option{display:block;width:100%;text-align:left;padding:13px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--soft)}
+.duel-option:disabled{opacity:.75}.duel-option.selected{border:2px solid var(--fg)}
+.duel-score{display:flex;justify-content:space-between;gap:10px;padding:14px;background:var(--soft);border-radius:14px;margin:12px 0}
 .hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.hero h2{margin:0}
 :focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 </style></head><body>
@@ -90,6 +93,17 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
  <div class="tabs" id="roomTabs"><button data-c="dil">Diller</button><button data-c="muzik">Müzik</button><button data-c="edebiyat">Edebiyat</button></div>
  <div class="sec" id="roomList"></div></section>
 
+<section class="page" id="p-duel"><div class="sec">
+  <button class="pill" id="duelBack">← Odalara dön</button>
+  <h2 style="margin-top:18px">🇩🇪 InSync Duell</h2>
+  <p class="mut">İki kişi, 10 soru, Almanca bilgi yarışması.</p>
+  <div id="duelLobby"><label class="lbl" for="duelLevel">Seviye</label>
+   <select id="duelLevel" class="field"><option>A1</option><option>A2</option><option>B1</option></select>
+   <button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
+  <div id="duelGame" hidden><div id="duelStatus" class="mut"></div>
+   <div id="duelScores" class="duel-score"></div><div id="duelQuestion"></div>
+   <button class="pill" id="duelLeave" style="margin-top:18px">Odadan çık</button></div>
+ </div></section>
 <section class="page" id="p-chat">
  <div class="sec" style="padding-bottom:6px"><button class="ib" id="backRooms" aria-label="Odalara dön">‹</button><b id="chatTitle" style="font-size:20px"></b><p class="mut" id="chatDesc" style="margin:2px 0 0 12px"></p></div>
  <div class="msgs" id="messages"></div>
@@ -124,14 +138,15 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
 import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
+import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment,where,runTransaction}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
 const app=initializeApp({apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'});
 const auth=getAuth(app),db=getFirestore(app);
 
 const TOPICS={genel:'Genel',dil:'Dil',muzik:'Müzik',edebiyat:'Edebiyat'};
 const ROOMS=[
- {id:'almanca-a1',c:'dil',i:'🇩🇪',n:'Almanca A1',d:'Temel Almanca konuşma pratiği'},
+ {id:'almanca-duell',c:'dil',i:'⚔️',n:'Almanca Düello',d:'A1 / A2 / B1 · İki kişilik yarışma',duel:true},
+  {id:'almanca-a1',c:'dil',i:'🇩🇪',n:'Almanca A1',d:'Temel Almanca konuşma pratiği'},
  {id:'almanca-a2',c:'dil',i:'🇩🇪',n:'Almanca A2',d:'Günlük hayatta Almanca'},
  {id:'almanca-b1',c:'dil',i:'🇩🇪',n:'Almanca B1',d:'Daha akıcı konuşmalar'},
  {id:'ingilizce',c:'dil',i:'🇬🇧',n:'İngilizce',d:'Her seviyeden konuşma pratiği'},
@@ -162,7 +177,7 @@ function paint(n,u,fb){const ph=u?.photo;if(ph&&ph.startsWith('data:image/')){n.
 function paintMe(){['meAv','compAv'].forEach(id=>paint($(id),me,handle()))}
 
 function go(n){page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
- const nav={chat:'rooms',thread:'home',edit:'profile'}[n]||n;
+ const nav={chat:'rooms',duel:'rooms',thread:'home',edit:'profile'}[n]||n;
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===nav));scrollTo(0,0);
  if(n==='search')renderSearch();if(n==='rooms')renderRooms()}
 
@@ -203,7 +218,7 @@ $('backHome').onclick=()=>{stop.rep?.();go('home')};
 
 /* ---------- Odalar ---------- */
 function roomEl(r){const i=el('div','room'),info=el('div','ri'),b=el('button','pill','Katıl');
- info.append(el('b','',r.n),el('br'),el('small','',r.d));i.append(el('div','em',r.i),info,b);b.onclick=()=>openRoom(r);return i}
+ info.append(el('b','',r.n),el('br'),el('small','',r.d));i.append(el('div','em',r.i),info,b);b.onclick=()=>r.duel?openDuel():openRoom(r);return i}
 function renderRooms(){document.querySelectorAll('#roomTabs button').forEach(b=>b.classList.toggle('active',b.dataset.c===roomCat));
  $('roomList').replaceChildren(...ROOMS.filter(r=>r.c===roomCat).map(roomEl))}
 function openRoom(r){room=r;stop.chat?.();$('chatTitle').textContent=r.i+' '+r.n;$('chatDesc').textContent=r.d;
@@ -216,6 +231,85 @@ $('chatForm').onsubmit=async e=>{e.preventDefault();const t=$('chatInput').value
  try{await addDoc(collection(db,'rooms',room.id,'messages'),{text:t,userId:user.uid,username:handle(),createdAt:serverTimestamp()});$('chatInput').value=''}catch(err){toast(msg(err))}};
 $('backRooms').onclick=()=>{stop.chat?.();go('rooms')};
 $('roomTabs').onclick=e=>{const c=e.target.dataset.c;if(c){roomCat=c;renderRooms()}};
+
+
+/* ---------- Almanca Düello (iki oyunculu) ---------- */
+const DUEL_Q={
+ A1:[
+ ['Ich ___ aus der Türkei.',['komme','kommt','bist','kommen'],0],
+ ['Wie ___ du?',['heiße','heißt','heißen','heißt du'],1],
+ ['Guten ___!',['Morgen','Nacht','Abendessen','Danke'],0],
+ ['Ich habe ___ Hund.',['ein','eine','einen','einem'],2],
+ ['Wir ___ in Izmir.',['wohnt','wohne','wohnen','wohnst'],2],
+ ['Was kostet ___ Brot?',['der','das','die','den'],1],
+ ['Ich ___ 55 Jahre alt.',['habe','bin','ist','seid'],1],
+ ['___ ist dein Name?',['Wo','Wer','Wie','Wann'],2],
+ ['Sie ___ Deutsch.',['sprechen','spricht','spreche','sprecht'],1],
+ ['Ich trinke gern ___.',['Wasser','Wassers','Wassern','Wasseres'],0]],
+ A2:[
+ ['Ich bleibe zu Hause, ___ es regnet.',['weil','denn','aber','oder'],0],
+ ['Gestern ___ ich ins Kino gegangen.',['bin','habe','war','werde'],0],
+ ['Kannst du mir ___?',['helfen','hilfst','geholfen','hilft'],0],
+ ['Ich interessiere mich ___ Musik.',['für','an','auf','bei'],0],
+ ['Das Buch liegt ___ Tisch.',['auf dem','auf den','in die','unter die'],0],
+ ['Er ist ___ als ich.',['größer','groß','am größten','große'],0],
+ ['Wenn ich Zeit habe, ___ ich dich an.',['rufe','anrufe','rufen','ruft'],0],
+ ['Sie hat ___ gekauft.',['ein neues Fahrrad','einen neues Fahrrad','eine neuer Fahrrad','ein neuen Fahrrad'],0],
+ ['Ich freue mich ___ deinen Besuch.',['auf','an','für','mit'],0],
+ ['Wir fahren ___ dem Zug.',['mit','auf','an','durch'],0]],
+ B1:[
+ ['Obwohl es regnet, ___ wir spazieren.',['gehen','wir gehen','ging','gegangen'],0],
+ ['Ich weiß nicht, ___ er heute kommt.',['ob','weil','denn','als'],0],
+ ['Das ist der Mann, ___ ich gestern getroffen habe.',['den','der','dem','dessen'],0],
+ ['Wenn ich mehr Zeit hätte, ___ ich mehr lesen.',['würde','werde','habe','bin'],0],
+ ['Sie hat vergessen, die Tür ___.',['abzuschließen','abschließen','geschlossen','schließt'],0],
+ ['Der Brief wurde gestern ___.',['geschrieben','schreiben','schreibt','schrieb'],0],
+ ['Ich habe mich ___ den Fehler geärgert.',['über','für','auf','zu'],0],
+ ['Je mehr ich übe, ___ besser werde ich.',['desto','weil','als','ob'],0],
+ ['Er tut so, ___ er alles wüsste.',['als ob','damit','weil','obwohl'],0],
+ ['Trotz ___ Wetters gehen wir raus.',['des schlechten','dem schlechten','das schlechte','den schlechten'],0]]
+};
+let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0;
+function openDuel(){go('duel');if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
+function duelReset(){duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
+$('duelBack').onclick=()=>go('rooms');
+$('duelLeave').onclick=()=>{duelReset();go('rooms')};
+$('duelFind').onclick=async()=>{
+ if(duelBusy||duelId)return;duelBusy=true;$('duelFind').disabled=true;
+ const level=$('duelLevel').value;
+ try{
+  const waiting=await new Promise((resolve,reject)=>{const un=onSnapshot(query(collection(db,'duels'),where('status','==','waiting'),limit(40)),s=>{un();resolve(s.docs)},e=>{un();reject(e)})});
+  let joined=null;
+  for(const snap of waiting){const d=snap.data();if(d.level!==level||d.host===user.uid)continue;
+   try{const success=await runTransaction(db,async tx=>{const ref=doc(db,'duels',snap.id),fresh=await tx.get(ref);
+    if(!fresh.exists()||fresh.data().status!=='waiting'||fresh.data().level!==level||fresh.data().host===user.uid)return false;
+    tx.update(ref,{guest:user.uid,guestName:handle(),status:'playing'});return true});
+    if(success){joined=snap.id;break}
+   }catch(e){if(e.code==='permission-denied')throw e}
+  }
+  if(!joined){const ref=await addDoc(collection(db,'duels'),{level,host:user.uid,hostName:handle(),guest:null,guestName:'',status:'waiting',createdAt:serverTimestamp()});joined=ref.id}
+  duelId=joined;duelAnswers=[];duelSince=Date.now();$('duelLobby').hidden=true;$('duelGame').hidden=false;
+  duelStop=onSnapshot(doc(db,'duels',duelId),s=>{if(!s.exists()){toast('Düello bulunamadı');duelReset();return}duelState=s.data();renderDuel()},e=>toast(msg(e)));
+  duelAnswerStop=onSnapshot(collection(db,'duels',duelId,'answers'),s=>{duelAnswers=s.docs.map(x=>x.data());renderDuel()},e=>toast(msg(e)));
+ }catch(e){toast(msg(e));$('duelFind').disabled=false}finally{duelBusy=false}
+};
+function renderDuel(){if(!duelState||!duelId)return;
+ const d=duelState,qs=DUEL_Q[d.level],participants=[d.host,d.guest].filter(Boolean),my=duelAnswers.filter(a=>a.uid===user.uid),their=duelAnswers.filter(a=>a.uid!==user.uid);
+ const score=uid=>duelAnswers.filter(a=>a.uid===uid&&qs[a.q]&&a.choice===qs[a.q][2]).length*10;
+ $('duelScores').replaceChildren(el('div','',`${d.hostName}: ${score(d.host)} puan`),el('div','',`${d.guestName||'Rakip bekleniyor…'}: ${d.guest?score(d.guest):'—'} puan`));
+ const area=$('duelQuestion');area.replaceChildren();
+ if(d.status==='waiting'||!d.guest){$('duelStatus').textContent='Rakip bekleniyor… Başka bir üye Almanca Düello odasına girip aynı seviyeyi seçmeli.';area.append(el('p','mut','Bu sayfayı açık tutabilirsin.'));return}
+ const next=Array.from({length:10},(_,i)=>i).find(i=>!my.some(a=>a.q===i));
+ if(next===undefined){$('duelStatus').textContent=their.length===10?'Düello tamamlandı!':'Soruların bitti. Rakibin bekleniyor…';
+  if(their.length===10){const mine=score(user.uid),other=score(participants.find(x=>x!==user.uid));area.append(el('h3','',mine===other?'Berabere!':mine>other?'Kazandın! 🎉':'Rakibin kazandı!'));const b=el('button','pill pri','Tekrar oyna');b.onclick=()=>{duelReset();openDuel()};area.append(b)}return}
+ $('duelStatus').textContent=`${d.level} · Soru ${next+1}/10 · Doğru cevap 10 puan`;
+ const q=qs[next];area.append(el('h3','',q[0]));
+ q[1].forEach((choice,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${choice}`);b.onclick=async()=>{
+  if(b.disabled||duelBusy||my.some(a=>a.q===next))return;duelBusy=true;area.querySelectorAll('button').forEach(x=>x.disabled=true);
+  try{await setDoc(doc(db,'duels',duelId,'answers',`${user.uid}_${next}`),{uid:user.uid,q:next,choice:i,createdAt:serverTimestamp()});duelSince=Date.now()}
+  catch(e){toast(msg(e));renderDuel()}finally{duelBusy=false}
+ };area.append(b)});
+}
 
 /* ---------- Arama ---------- */
 function renderSearch(){const q=$('q').value.toLocaleLowerCase('tr').trim(),box=$('results');
@@ -259,7 +353,7 @@ $('topicTabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;topic=t;docum
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
 
 onAuthStateChanged(auth,async u=>{
- Object.values(stop).forEach(f=>f?.());stop={};user=u;posts=[];
+ Object.values(stop).forEach(f=>f?.());stop={};duelReset();user=u;posts=[];
  $('loading').hidden=true;$('auth').hidden=!!u;$('app').hidden=!u;
  if(!u){users.clear();me={};$('password').value='';return}
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
