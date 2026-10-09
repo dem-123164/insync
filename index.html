@@ -3,6 +3,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>InSync · Düello 1/3/5 dk</title>
+ <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#101010">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--bg:#fff;--fg:#111;--mut:#8a8a8a;--line:#ececec;--soft:#f5f5f5;--red:#e11d48;color-scheme:light dark}
 @media(prefers-color-scheme:dark){:root{--bg:#101010;--fg:#f3f3f3;--mut:#8f8f8f;--line:#262626;--soft:#1b1b1b}}
@@ -433,4 +438,17 @@ onAuthStateChanged(auth,async u=>{
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
  try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
  users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing()});
-</script></body></html>
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('InSync uygulaması hazır'))
+      .catch(err => console.error('PWA hatası:', err));
+  });
+}
+</script>
+
+</body>
+</html>
