@@ -2,12 +2,7 @@
 <html lang="tr"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>InSync · Düello 1/3/5 dk</title>
- <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#101010">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>InSync · Çoklu Düello ve Davet</title>
 <style>
 :root{--bg:#fff;--fg:#111;--mut:#8a8a8a;--line:#ececec;--soft:#f5f5f5;--red:#e11d48;color-scheme:light dark}
 @media(prefers-color-scheme:dark){:root{--bg:#101010;--fg:#f3f3f3;--mut:#8f8f8f;--line:#262626;--soft:#1b1b1b}}
@@ -98,8 +93,8 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <section class="page" id="p-duel"><div class="sec">
   <button class="pill" id="duelBack">← Odalara dön</button>
   <h2 style="margin-top:18px">🇩🇪 InSync Duell</h2>
-  <p class="mut">İki kişi, 10 soru, Almanca bilgi yarışması. · Sürüm: 1-3-5 dakika</p>
-  <div id="duelLobby"><label class="lbl" for="duelLevel">Seviye</label>
+  <p class="mut">İki kişi, her düelloda rastgele 10 soru. · 1 / 3 / 5 dakika</p>
+  <div id="duelLobby"><h3>Gelen düello davetleri</h3><div id="duelInvites" class="mut">Davetler yükleniyor…</div><label class="lbl" for="duelLevel">Seviye</label>
    <select id="duelLevel" class="field"><option>A1</option><option>A2</option><option>B1</option></select>
    <label class="lbl" for="duelSeconds">10 soru için toplam süre</label><select id="duelSeconds" class="field"><option value="60">1 dakika</option><option value="180" selected>3 dakika</option><option value="300">5 dakika</option></select><button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
   <div id="duelGame" hidden><div id="duelStatus" class="mut"></div>
@@ -121,7 +116,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <section class="page" id="p-activity"><div class="sec"><h2>Hareketler</h2><div id="activityList" class="mut">Bildirimler yükleniyor…</div></div></section>
 <section class="page" id="p-profile"><div class="sec">
  <div class="hero"><div><h2 id="pName"></h2><div class="mut" id="pHandle"></div></div><div class="avatar lg" id="pAv"></div></div>
- <div class="profile-meta"><button id="followersBtn" class="mut">0 takipçi</button><button id="followingBtn" class="mut">0 takip edilen</button></div><button class="pill" id="followBtn" hidden>Takip et</button><p id="pBio"></p><button class="pill" id="editBtn">Profili düzenle</button><details style="margin:18px 0;border-block:1px solid var(--line);padding:14px 0"><summary style="cursor:pointer;font-weight:700">🏆 Dil Puanlarım</summary><div id="languageScores" style="padding-top:10px"></div></details>
+ <div class="profile-meta"><button id="followersBtn" class="mut">0 takipçi</button><button id="followingBtn" class="mut">0 takip edilen</button></div><button class="pill" id="followBtn" hidden>Takip et</button><button class="pill pri" id="inviteBtn" hidden style="margin-left:8px">⚔️ Düelloya davet et</button><p id="pBio"></p><button class="pill" id="editBtn">Profili düzenle</button><details style="margin:18px 0;border-block:1px solid var(--line);padding:14px 0"><summary style="cursor:pointer;font-weight:700">🏆 Dil Puanlarım</summary><div id="languageScores" style="padding-top:10px"></div></details>
  <h3 style="margin:26px 0 0">Paylaşımlar</h3></div><div id="pPosts"></div></section>
 
 <section class="page" id="p-edit"><div class="sec"><h2>Profili düzenle</h2>
@@ -260,7 +255,7 @@ function drawRooms(){document.querySelectorAll('#roomTabs button').forEach(b=>b.
 const DUEL_Q={
  A1:[
  ['Ich ___ aus der Türkei.',['komme','kommt','bist','kommen'],0],
- ['Wie ___ du?',['heiße','heißt','heißen','heißt du'],1],
+ ['Wie ___ du?',['heiße','heißt','heißen','heißt ihr'],1],
  ['Guten ___!',['Morgen','Nacht','Abendessen','Danke'],0],
  ['Ich habe ___ Hund.',['ein','eine','einen','einem'],2],
  ['Wir ___ in Izmir.',['wohnt','wohne','wohnen','wohnst'],2],
@@ -292,28 +287,76 @@ const DUEL_Q={
  ['Er tut so, ___ er alles wüsste.',['als ob','damit','weil','obwohl'],0],
  ['Trotz ___ Wetters gehen wir raus.',['des schlechten','dem schlechten','das schlechte','den schlechten'],0]]
 };
-let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0,duelClock=null,duelSaving=false;
+
+// Her seviyeye özgü genişletilmiş soru bankası.
+const DUEL_TEMPLATES = {"A1":[["Ich ___ aus {city}.",["komme","kommt","kommen","kommst"],0,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Wir ___ in {city}.",["wohnt","wohne","wohnen","wohnst"],2,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Er ___ in {city}.",["wohnen","wohnst","wohnt","wohne"],2,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Ich ___ gern {thing}.",["trinkst","trinke","trinkt","trinken"],1,["Wasser","Tee","Kaffee","Milch","Saft","Apfelsaft","Orangensaft","Kakao","Mineralwasser","Limonade"]],["Du ___ gern {thing}.",["trinke","trinken","trinkt","trinkst"],3,["Wasser","Tee","Kaffee","Milch","Saft","Apfelsaft","Orangensaft","Kakao","Mineralwasser","Limonade"]],["Wir ___ heute {thing}.",["trinken","trinkt","trinkst","trinke"],0,["Wasser","Tee","Kaffee","Milch","Saft","Apfelsaft","Orangensaft","Kakao","Mineralwasser","Limonade"]],["Ich ___ jeden Tag {activity}.",["machen","macht","mache","machst"],2,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Sie (Plural) ___ heute {activity}.",["macht","machen","machst","mache"],1,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Er ___ jeden Tag {activity}.",["mache","machen","machst","macht"],3,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Wir ___ heute nach {city}.",["fährt","fahren","fahre","fährst"],1,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Ich ___ morgen nach {city}.",["fahre","fährt","fahren","fährst"],0,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Er ___ morgen nach {city}.",["fahren","fahre","fährst","fährt"],3,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Ich ___ {thing} kaufen.",["möchte","möchtest","möchten","möchtet"],0,["Brot","Wasser","Tee","Kaffee","Milch","Saft","Käse","Obst","Gemüse","Reis"]],["Wir ___ {thing} kaufen.",["möchte","möchtest","möchten","möchtet"],2,["Brot","Wasser","Tee","Kaffee","Milch","Saft","Käse","Obst","Gemüse","Reis"]],["Du ___ {thing} kaufen.",["möchte","möchten","möchtet","möchtest"],3,["Brot","Wasser","Tee","Kaffee","Milch","Saft","Käse","Obst","Gemüse","Reis"]],["Ich ___ heute {activity}.",["mache","macht","machen","machst"],0,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Du ___ heute {activity}.",["mache","macht","machen","machst"],3,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Wir ___ gern {thing}.",["essen","esst","isst","esse"],0,["Brot","Reis","Obst","Gemüse","Käse","Fisch","Fleisch","Müsli","Joghurt","Salat"]],["Ich ___ gern {thing}.",["isst","esse","essen","esst"],1,["Brot","Reis","Obst","Gemüse","Käse","Fisch","Fleisch","Müsli","Joghurt","Salat"]],["Du ___ gern {thing}.",["esse","essen","esst","isst"],3,["Brot","Reis","Obst","Gemüse","Käse","Fisch","Fleisch","Müsli","Joghurt","Salat"]]],"A2":[["Ich bleibe zu Hause, ___ ich {reason}.",["weil","denn","aber","oder"],0,["krank bin","müde bin","arbeiten muss","lernen muss","Besuch bekomme","keine Zeit habe","Kopfschmerzen habe","früh aufstehen muss","viel zu tun habe","mich ausruhen möchte"]],["Er bleibt zu Hause, ___ er {reason}.",["denn","weil","oder","aber"],1,["krank ist","müde ist","arbeiten muss","lernen muss","Besuch bekommt","keine Zeit hat","Kopfschmerzen hat","früh aufstehen muss","viel zu tun hat","sich ausruhen möchte"]],["Wir fahren nicht, ___ wir {reason}.",["oder","aber","weil","denn"],2,["krank sind","müde sind","arbeiten müssen","lernen müssen","Besuch bekommen","keine Zeit haben","Kopfschmerzen haben","früh aufstehen müssen","viel zu tun haben","uns ausruhen möchten"]],["Ich interessiere mich ___ {subject}.",["für","an","auf","bei"],0,["Musik","Kunst","Sport","Literatur","Geschichte","Politik","Fotografie","Technik","Wissenschaft","Architektur"]],["Er interessiert sich ___ {subject}.",["an","für","bei","auf"],1,["Musik","Kunst","Sport","Literatur","Geschichte","Politik","Fotografie","Technik","Wissenschaft","Architektur"]],["Wir interessieren uns ___ {subject}.",["auf","bei","für","an"],2,["Musik","Kunst","Sport","Literatur","Geschichte","Politik","Fotografie","Technik","Wissenschaft","Architektur"]],["Gestern ___ ich nach {city} gefahren.",["bin","habe","werde","hat"],0,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Letzte Woche ___ wir nach {city} gefahren.",["haben","sind","seid","ist"],1,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Sie (Singular) ___ nach {city} gefahren.",["haben","bist","ist","seid"],2,["Berlin","Hamburg","München","Bremen","Köln","Dresden","Leipzig","Bonn","Stuttgart","Dortmund"]],["Wenn ich Zeit habe, ___ ich {activity}.",["mache","macht","machen","machst"],0,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Wenn wir Zeit haben, ___ wir {activity}.",["macht","machen","machst","mache"],1,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Wenn er Zeit hat, ___ er {activity}.",["machen","mache","macht","machst"],2,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Ich freue mich ___ {event}.",["auf","an","mit","bei"],0,["das Wochenende","den Urlaub","den Besuch","das Konzert","den Sommer","das Fest","den Ausflug","den Feiertag","den Kurs","das Treffen"]],["Wir freuen uns ___ {event}.",["an","auf","bei","mit"],1,["das Wochenende","den Urlaub","den Besuch","das Konzert","den Sommer","das Fest","den Ausflug","den Feiertag","den Kurs","das Treffen"]],["Er freut sich ___ {event}.",["an","bei","auf","mit"],2,["das Wochenende","den Urlaub","den Besuch","das Konzert","den Sommer","das Fest","den Ausflug","den Feiertag","den Kurs","das Treffen"]],["Ich habe gestern {thing} ___.",["gekauft","kaufen","kaufe","kauft"],0,["Brot","Wasser","Tee","Kaffee","Milch","Saft","Käse","Obst","Gemüse","Reis"]],["Wir haben heute {thing} ___.",["kaufen","gekauft","kaufe","kauft"],1,["Brot","Wasser","Tee","Kaffee","Milch","Saft","Käse","Obst","Gemüse","Reis"]],["Er hat {thing} ___.",["kaufen","kauft","gekauft","kaufe"],2,["Brot","Wasser","Tee","Kaffee","Milch","Saft","Käse","Obst","Gemüse","Reis"]],["Ich muss heute {activity} ___.",["machen","mache","macht","machst"],0,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]],["Wir wollen morgen {activity} ___.",["mache","machen","macht","machst"],1,["Sport","Yoga","Musik","Pause","Gymnastik","Hausaufgaben","Fotos","Übungen","Frühstück","einen Spaziergang"]]],"B1":[["Obwohl ich {state}, ___ ich zur Arbeit.",["gehe","gehen","geht","gehst"],0,["müde bin","krank bin","wenig geschlafen habe","keine Lust habe","Kopfschmerzen habe","viel zu tun habe","spät dran bin","schlecht geschlafen habe","gestresst bin","erschöpft bin"]],["Obwohl wir {state}, ___ wir spazieren.",["geht","gehen","gehe","gehst"],1,["müde sind","krank sind","wenig geschlafen haben","keine Lust haben","Kopfschmerzen haben","viel zu tun haben","spät dran sind","schlecht geschlafen haben","gestresst sind","erschöpft sind"]],["Obwohl er {state}, ___ er ins Büro.",["gehen","gehe","geht","gehst"],2,["müde ist","krank ist","wenig geschlafen hat","keine Lust hat","Kopfschmerzen hat","viel zu tun hat","spät dran ist","schlecht geschlafen hat","gestresst ist","erschöpft ist"]],["Ich weiß nicht, ___ er {action}.",["ob","weil","denn","als"],0,["heute kommt","morgen arbeitet","Zeit hat","uns besucht","Deutsch spricht","schon fertig ist","zu Hause bleibt","den Termin kennt","die Antwort weiß","mit uns fährt"]],["Wir wissen nicht, ___ sie {action}.",["weil","ob","als","denn"],1,["heute kommt","morgen arbeitet","Zeit hat","uns besucht","Deutsch spricht","schon fertig ist","zu Hause bleibt","den Termin kennt","die Antwort weiß","mit uns fährt"]],["Sie fragt, ___ er {action}.",["weil","als","ob","denn"],2,["heute kommt","morgen arbeitet","Zeit hat","uns besucht","Deutsch spricht","schon fertig ist","zu Hause bleibt","den Termin kennt","die Antwort weiß","mit uns fährt"]],["Wenn ich mehr Zeit hätte, ___ ich {verb}.",["würde","werde","habe","bin"],0,["mehr lesen","mehr reisen","Deutsch lernen","Sport machen","Klavier spielen","meine Freunde besuchen","öfter kochen","früher schlafen","mehr schreiben","mehr üben"]],["Wenn wir mehr Geld hätten, ___ wir {verb}.",["werden","würden","haben","sind"],1,["mehr lesen","mehr reisen","Deutsch lernen","Sport machen","Klavier spielen","unsere Freunde besuchen","öfter kochen","früher schlafen","mehr schreiben","mehr üben"]],["Wenn er mehr Zeit hätte, ___ er {verb}.",["werde","hat","würde","ist"],2,["mehr lesen","mehr reisen","Deutsch lernen","Sport machen","Klavier spielen","seine Freunde besuchen","öfter kochen","früher schlafen","mehr schreiben","mehr üben"]],["Ich habe mich ___ {topic} geärgert.",["über","für","auf","zu"],0,["den Lärm","den Fehler","den Stau","den Regen","den Preis","den Streit","den Termin","den Verkehr","den Verlust","den Kommentar"]],["Er hat sich ___ {topic} geärgert.",["für","über","auf","zu"],1,["den Lärm","den Fehler","den Stau","den Regen","den Preis","den Streit","den Termin","den Verkehr","den Verlust","den Kommentar"]],["Wir haben uns ___ {topic} geärgert.",["für","auf","über","zu"],2,["den Lärm","den Fehler","den Stau","den Regen","den Preis","den Streit","den Termin","den Verkehr","den Verlust","den Kommentar"]],["Je mehr ich {verb}, ___ besser werde ich.",["desto","weil","als","ob"],0,["übe","lerne","lese","spreche","schreibe","trainiere","wiederhole","zuhöre","nachfrage","ausprobiere"]],["Je länger wir {verb}, ___ mehr verstehen wir.",["weil","desto","ob","als"],1,["üben","lernen","lesen","sprechen","schreiben","trainieren","wiederholen","zuhören","nachfragen","ausprobieren"]],["Je öfter er {verb}, ___ sicherer wird er.",["weil","als","desto","ob"],2,["übt","lernt","liest","spricht","schreibt","trainiert","wiederholt","zuhört","nachfragt","ausprobiert"]],["Der Vertrag wurde {when} ___.",["unterschreiben","unterschrieben","unterschreibt","unterschrieb"],1,["heute","gestern","am Montag","am Dienstag","am Mittwoch","am Donnerstag","am Freitag","am Samstag","am Sonntag","letzte Woche"]]]};
+for(const [level,templates] of Object.entries(DUEL_TEMPLATES)){
+ for(const [pattern,options,correct,values] of templates){
+  for(const value of values){
+   const question=pattern.replace(/\{\w+\}/g,value);
+   DUEL_Q[level].push([question,options,correct]);
+  }
+ }
+}
+// Her iki rakip aynı soruları aynı sırada görür; her düellonun kimliği seçimi belirler.
+function duelQuestionIndices(id,level){
+ const n=DUEL_Q[level]?.length||0,arr=Array.from({length:n},(_,i)=>i);
+ let seed=2166136261;
+ for(const c of id+':'+level){seed^=c.charCodeAt(0);seed=Math.imul(seed,16777619)}
+ for(let i=n-1;i>0;i--){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;const j=(seed>>>0)%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]]}
+ return arr.slice(0,10);
+}
+
+let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0,duelClock=null,duelSaving=false,inviteStop=null;
 function openDuel(){go('duel');if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
 function duelReset(){clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;duelSaveError='';$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
 $('duelBack').onclick=()=>go('rooms');
 $('duelLeave').onclick=()=>{duelReset();go('rooms')};
+function watchDuelInvites(){
+ inviteStop?.();if(!user)return;
+ inviteStop=onSnapshot(query(collection(db,'duels'),where('guest','==',user.uid),where('status','==','invited'),limit(30)),snap=>{
+  const box=$('duelInvites');box.replaceChildren();
+  if(snap.empty){box.append(el('p','mut','Şu anda bekleyen davetin yok.'));return}
+  snap.forEach(item=>{const d=item.data(),r=el('div','usercard'),info=el('div','info',`${d.hostName||'Üye'} seni ${d.level} düellosuna davet ediyor.`),yes=el('button','pill pri','Kabul et'),no=el('button','pill','Reddet');
+   yes.onclick=async()=>{if(duelId)return toast('Önce mevcut düellodan çık.');yes.disabled=true;try{
+    const ok=await runTransaction(db,async tx=>{const ref=doc(db,'duels',item.id),s=await tx.get(ref);if(!s.exists()||s.data().status!=='invited'||s.data().guest!==user.uid)return false;tx.update(ref,{status:'playing',guestName:handle(),startedAt:Date.now()});return true});
+    if(ok)attachDuel(item.id);else toast('Davet artık geçerli değil.');
+   }catch(e){toast(msg(e))}finally{yes.disabled=false}};
+   no.onclick=async()=>{try{await updateDoc(doc(db,'duels',item.id),{status:'declined'})}catch(e){toast(msg(e))}};
+   r.append(info,yes,no);box.append(r)})
+ },e=>{$('duelInvites').textContent='Davetler alınamadı: '+msg(e)});
+}
+function attachDuel(id){
+ duelReset();duelId=id;duelAnswers=[];duelSince=Date.now();
+ duelClock=setInterval(()=>{if(duelId&&duelState?.status==='playing')renderDuel()},500);
+ $('duelLobby').hidden=true;$('duelGame').hidden=false;go('duel');
+ duelStop=onSnapshot(doc(db,'duels',id),snap=>{if(!snap.exists()){toast('Düello bulunamadı');duelReset();return}duelState=snap.data();renderDuel()},e=>toast(msg(e)));
+ duelAnswerStop=onSnapshot(collection(db,'duels',id,'answers'),snap=>{duelAnswers=snap.docs.map(x=>x.data());renderDuel()},e=>toast(msg(e)));
+}
+async function sendDuelInvite(uid){
+ if(!user||uid===user.uid)return;
+ if(duelId)return toast('Önce mevcut düellodan çık.');
+ const level=prompt('Düello seviyesi: A1, A2 veya B1','A1')?.trim().toUpperCase();
+ if(!level)return;if(!DUEL_Q[level])return toast('A1, A2 veya B1 seç.');
+ try{const ref=await addDoc(collection(db,'duels'),{level,seconds:180,host:user.uid,hostName:handle(),guest:uid,guestName:'',status:'invited',createdAt:serverTimestamp()});
+  attachDuel(ref.id);toast('Davet gönderildi. Rakibin kabul etmesini bekle.');
+ }catch(e){toast(msg(e))}
+}
 $('duelFind').onclick=async()=>{
  if(duelBusy||duelId)return;duelBusy=true;$('duelFind').disabled=true;
  const level=$('duelLevel').value,seconds=Number($('duelSeconds').value);
  try{
-  const waiting=await new Promise((resolve,reject)=>{const un=onSnapshot(query(collection(db,'duels'),where('status','==','waiting'),limit(40)),s=>{un();resolve(s.docs)},e=>{un();reject(e)})});
+  const waiting=await getDocs(query(collection(db,'duels'),where('status','==','waiting'),limit(100)));
   let joined=null;
-  for(const snap of waiting){const d=snap.data();if(d.level!==level||d.host===user.uid)continue;
+  for(const snap of waiting.docs){const d=snap.data();if(d.level!==level||d.seconds!==seconds||d.host===user.uid)continue;
    try{const success=await runTransaction(db,async tx=>{const ref=doc(db,'duels',snap.id),fresh=await tx.get(ref);
-    if(!fresh.exists()||fresh.data().status!=='waiting'||fresh.data().level!==level||fresh.data().host===user.uid)return false;
+    if(!fresh.exists()||fresh.data().status!=='waiting'||fresh.data().level!==level||fresh.data().seconds!==seconds||fresh.data().host===user.uid)return false;
     tx.update(ref,{guest:user.uid,guestName:handle(),status:'playing',startedAt:Date.now()});return true});
     if(success){joined=snap.id;break}
    }catch(e){if(e.code==='permission-denied')throw e}
   }
   if(!joined){const ref=await addDoc(collection(db,'duels'),{level,seconds,host:user.uid,hostName:handle(),guest:null,guestName:'',status:'waiting',createdAt:serverTimestamp()});joined=ref.id}
-  duelId=joined;duelAnswers=[];duelSince=Date.now();duelClock=setInterval(()=>{if(duelId&&duelState?.status==='playing')renderDuel()},500);$('duelLobby').hidden=true;$('duelGame').hidden=false;
-  duelStop=onSnapshot(doc(db,'duels',duelId),s=>{if(!s.exists()){toast('Düello bulunamadı');duelReset();return}duelState=s.data();renderDuel()},e=>toast(msg(e)));
-  duelAnswerStop=onSnapshot(collection(db,'duels',duelId,'answers'),s=>{duelAnswers=s.docs.map(x=>x.data());renderDuel()},e=>toast(msg(e)));
+  attachDuel(joined);
  }catch(e){toast(msg(e));$('duelFind').disabled=false}finally{duelBusy=false}
 };
 const savedDuelAttempts=new Set();
@@ -342,11 +385,14 @@ async function answerDuel(q,choice){
 }
 function renderDuel(){
  if(!duelState||!duelId||!user)return;
- const d=duelState,qs=DUEL_Q[d.level];if(!qs)return;
+ const d=duelState,bank=DUEL_Q[d.level];if(!bank)return;
+ const qs=duelQuestionIndices(duelId,d.level).map(i=>bank[i]);
  const my=duelAnswers.filter(a=>a.uid===user.uid),their=duelAnswers.filter(a=>a.uid!==user.uid);
  const score=uid=>duelAnswers.filter(a=>a.uid===uid&&qs[a.q]&&a.choice===qs[a.q][2]).length*10;
  $('duelScores').replaceChildren(el('div','',`${d.hostName}: ${score(d.host)} puan`),el('div','',`${d.guestName||'Rakip bekleniyor…'}: ${d.guest?score(d.guest):'—'} puan`));
  const area=$('duelQuestion');area.replaceChildren();
+ if(d.status==='declined'){ $('duelStatus').textContent='Davet reddedildi.';area.append(el('p','mut','Yeni bir rakip seçebilirsin.'));return}
+ if(d.status==='invited'){ $('duelStatus').textContent='Davet gönderildi, yanıt bekleniyor…';area.append(el('p','mut','Rakibin daveti kabul ettiğinde yarışma başlayacak.'));return}
  if(d.status==='waiting'||!d.guest){$('duelStatus').textContent=`Rakip bekleniyor… ${Math.round((d.seconds||180)/60)} dakikalık düello. Diğer oyuncu aynı seviyeyi seçerek katılabilir.`;area.append(el('p','mut','Oyun rakip katılınca başlar.'));return}
  const seconds=[60,180,300].includes(Number(d.seconds))?Number(d.seconds):180;
  const started=Number(d.startedAt)||Date.now();
@@ -378,7 +424,7 @@ async function notify(to,type,postId=''){
 function watchFollowing(){followUnsub?.();followUnsub=onSnapshot(collection(db,'users',user.uid,'following'),snap=>{following=new Set(snap.docs.map(d=>d.id));if(page==='search')renderSearch();if(page==='profile')renderProfile()},e=>console.warn(e))}
 function userCard(uid,u){const r=el('div','usercard'),av=el('button','avatar'),info=el('div','info'),name=el('button','name',profileLabel(u)),handleEl=el('div','mut','@'+(u.username||'uye'));
  paint(av,u);av.onclick=name.onclick=()=>openProfile(uid);info.append(name,handleEl);r.append(av,info);
- if(uid!==user.uid){const btn=el('button','pill',following.has(uid)?'Takiptesin':'Takip et');btn.onclick=()=>toggleFollow(uid,btn);r.append(btn)}return r}
+ if(uid!==user.uid){const btn=el('button','pill',following.has(uid)?'Takiptesin':'Takip et');btn.onclick=()=>toggleFollow(uid,btn);const invite=el('button','pill','⚔️ Davet');invite.onclick=()=>sendDuelInvite(uid);r.append(btn,invite)}return r}
 async function toggleFollow(uid,btn){if(!uid||uid===user.uid)return;btn.disabled=true;try{const followed=following.has(uid);const a=doc(db,'users',user.uid,'following',uid),b=doc(db,'users',uid,'followers',user.uid);
  if(followed){await deleteDoc(a);await deleteDoc(b)}else{await setDoc(a,{uid,createdAt:serverTimestamp()});await setDoc(b,{uid:user.uid,createdAt:serverTimestamp()});await notify(uid,'follow')}
  following[followed?'delete':'add'](uid);if(page==='search')renderSearch();if(page==='profile')renderProfile()
@@ -392,7 +438,7 @@ function openProfile(uid){viewUid=uid;go('profile');renderProfile()}
 async function renderProfile(){const uid=viewUid||user.uid,own=uid===user.uid,u=own?me:await getUser(uid);
  if(page!=='profile'||(viewUid||user.uid)!==uid)return;
  $('pName').textContent=profileLabel(u);$('pHandle').textContent='@'+(u.username||'uye');$('pBio').textContent=u.bio||'Henüz bir şey yazılmamış.';$('editBtn').hidden=!own;paint($('pAv'),u);
- const fb=$('followBtn');fb.hidden=own;if(!own){fb.textContent=following.has(uid)?'Takiptesin':'Takip et';fb.onclick=()=>toggleFollow(uid,fb)}
+ const ib=$('inviteBtn');ib.hidden=own;if(!own)ib.onclick=()=>sendDuelInvite(uid);const fb=$('followBtn');fb.hidden=own;if(!own){fb.textContent=following.has(uid)?'Takiptesin':'Takip et';fb.onclick=()=>toggleFollow(uid,fb)}
  const [followersSnap,followingSnap]=await Promise.all([getDocs(collection(db,'users',uid,'followers')),getDocs(collection(db,'users',uid,'following'))]);
  if(page!=='profile'||(viewUid||user.uid)!==uid)return;
  $('followersBtn').textContent=followersSnap.size+' takipçi';$('followingBtn').textContent=followingSnap.size+' takip edilen';
@@ -432,23 +478,10 @@ $('fake').onclick=$('fakeBtn').onclick=()=>go('create');
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
 
 onAuthStateChanged(auth,async u=>{
- Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();duelReset();user=u;posts=[];
+ Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();inviteStop?.();duelReset();user=u;posts=[];
  $('loading').hidden=true;$('auth').hidden=!!u;$('app').hidden=!u;
  if(!u){users.clear();me={};$('password').value='';return}
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
  try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
- users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing()});
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('InSync uygulaması hazır'))
-      .catch(err => console.error('PWA hatası:', err));
-  });
-}
-</script>
-
-</body>
-</html>
+ users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing();watchDuelInvites()});
+</script></body></html>
