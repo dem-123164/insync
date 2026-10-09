@@ -31,7 +31,7 @@ button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;ba
 .field{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:12px;margin:6px 0}
 textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700;margin-top:12px}
 .room{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
-.room .em{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:var(--soft);font-size:24px}.room .ri{flex:1}.room small{color:var(--mut)}
+.room .em{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:var(--soft);font-size:24px}.room .ri{flex:1}.room small{color:var(--mut)}.online{font-size:12px;color:#168a49;font-weight:700}.online::before{content:'● ';}
 .msgs{padding:16px;height:calc(100dvh - 270px);min-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
 .bubble{max-width:82%;padding:9px 13px;border-radius:16px;background:var(--soft);overflow-wrap:anywhere}
 .bubble b{font-size:12px;display:block;color:var(--mut)}.bubble p{margin:2px 0 0;white-space:pre-wrap}
@@ -144,6 +144,7 @@ const app=initializeApp({apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDo
 const auth=getAuth(app),db=getFirestore(app);
 
 const TOPICS={genel:'Genel',dil:'Dil',muzik:'Müzik',edebiyat:'Edebiyat'};
+const PRESENCE_TTL=90000;let activeRoomId=null,presenceTimer=null,presenceStop=null,roomPresenceStop=null;const roomCounts=new Map();
 const ROOMS=[
  {id:'almanca-duell',c:'dil',i:'⚔️',n:'Almanca Düello',d:'A1 / A2 / B1 · İki kişilik yarışma',duel:true},
   {id:'almanca-a1',c:'dil',i:'🇩🇪',n:'Almanca A1',d:'Temel Almanca konuşma pratiği'},
@@ -176,7 +177,7 @@ function ago(ts){const d=ts?.toDate?.();if(!d)return'şimdi';const s=(Date.now()
 function paint(n,u,fb){const ph=u?.photo;if(ph&&ph.startsWith('data:image/')){n.textContent='';n.style.backgroundImage=`url("${ph}")`}else{n.style.backgroundImage='';n.textContent=(u?.name||u?.username||fb||'?').charAt(0).toUpperCase()}}
 function paintMe(){['meAv','compAv'].forEach(id=>paint($(id),me,handle()))}
 
-function go(n){page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
+function go(n){if(page==='chat'&&n!=='chat')leaveRoomPresence();page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
  const nav={chat:'rooms',duel:'rooms',thread:'home',edit:'profile'}[n]||n;
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===nav));scrollTo(0,0);
  if(n==='search')renderSearch();if(n==='rooms')renderRooms()}
@@ -192,7 +193,7 @@ function postEl(p){
  const lk=el('button',liked?'on':'',(liked?'♥ ':'♡ ')+(likes.length||'Beğen'));
  lk.onclick=()=>updateDoc(doc(db,'posts',p.id),{likes:liked?arrayRemove(user.uid):arrayUnion(user.uid)}).catch(e=>toast(msg(e)));
  const rp=el('button','','◯ '+(p.replyCount?p.replyCount+' yanıt':'Yanıtla'));rp.onclick=()=>openThread(p.id);
- const sh=el('button','','↗ Kopyala');sh.onclick=async()=>{try{await navigator.clipboard.writeText(p.text||'');toast('Metin kopyalandı')}catch{toast('Kopyalanamadı')}};
+ const sh=el('button','','↗ Paylaş');sh.onclick=async()=>{const url=location.origin+location.pathname+'#post-'+encodeURIComponent(p.id);try{if(navigator.share)await navigator.share({title:'InSync paylaşımı',text:p.text||'',url});else{await navigator.clipboard.writeText(url);toast('Paylaşım bağlantısı kopyalandı')}}catch(e){if(e.name!=='AbortError')toast('Paylaşılamadı')}};
  acts.append(lk,rp,sh);
  if(p.userId===user.uid){const d=el('button','','Sil');d.onclick=async()=>{if(!confirm('Bu paylaşım silinsin mi?'))return;try{await deleteDoc(doc(db,'posts',p.id));if(page==='thread')go('home')}catch(e){toast(msg(e))}};acts.append(d)}
  b.append(h,el('div','txt',p.text||''),acts);r.append(av,b);return r}
@@ -201,7 +202,7 @@ function renderFeed(){
  $('feed').replaceChildren(...arr.map(postEl));
  $('feedStatus').textContent=arr.length?'':'Bu başlıkta henüz paylaşım yok. İlk paylaşımı sen yap!';
  $('feedStatus').hidden=!!arr.length;
- if(page==='profile')renderProfile();if(page==='thread')renderThread();if(page==='search')renderSearch()}
+ if(page==='profile')renderProfile();if(page==='thread')renderThread();if(page==='search')renderSearch();if(location.hash.startsWith('#post-')){const id=decodeURIComponent(location.hash.slice(6));if(posts.some(p=>p.id===id)){history.replaceState(null,'',location.pathname);openThread(id)}}}
 function startFeed(){stop.feed=onSnapshot(query(collection(db,'posts'),orderBy('createdAt','desc'),limit(100)),s=>{posts=s.docs.map(d=>({id:d.id,...d.data()}));renderFeed()},e=>{$('feedStatus').hidden=false;$('feedStatus').textContent='Paylaşımlar yüklenemedi. '+msg(e)})}
 
 /* ---------- Yanıtlar ---------- */
@@ -218,10 +219,9 @@ $('backHome').onclick=()=>{stop.rep?.();go('home')};
 
 /* ---------- Odalar ---------- */
 function roomEl(r){const i=el('div','room'),info=el('div','ri'),b=el('button','pill','Katıl');
- info.append(el('b','',r.n),el('br'),el('small','',r.d));i.append(el('div','em',r.i),info,b);b.onclick=()=>r.duel?openDuel():openRoom(r);return i}
-function renderRooms(){document.querySelectorAll('#roomTabs button').forEach(b=>b.classList.toggle('active',b.dataset.c===roomCat));
- $('roomList').replaceChildren(...ROOMS.filter(r=>r.c===roomCat).map(roomEl))}
-function openRoom(r){room=r;stop.chat?.();$('chatTitle').textContent=r.i+' '+r.n;$('chatDesc').textContent=r.d;
+ info.append(el('b','',r.n),el('br'),el('small','',r.d));const count=roomCounts.get(r.id)||0;if(!r.duel&&count)info.append(el('br'),el('span','online',count+' kişi aktif'));i.append(el('div','em',r.i),info,b);b.onclick=()=>r.duel?openDuel():openRoom(r);return i}
+function renderRooms(){watchRoomPresence();drawRooms()}
+function openRoom(r){room=r;stop.chat?.();enterRoomPresence(r.id);$('chatTitle').textContent=r.i+' '+r.n;$('chatDesc').textContent=r.d;
  $('messages').replaceChildren(el('p','empty','Mesajlar yükleniyor…'));go('chat');
  stop.chat=onSnapshot(query(collection(db,'rooms',r.id,'messages'),orderBy('createdAt','desc'),limit(100)),s=>{
   const list=s.docs.map(d=>d.data()).reverse(),box=$('messages');
@@ -229,10 +229,30 @@ function openRoom(r){room=r;stop.chat?.();$('chatTitle').textContent=r.i+' '+r.n
   box.scrollTop=box.scrollHeight},e=>$('messages').replaceChildren(el('p','empty',msg(e))))}
 $('chatForm').onsubmit=async e=>{e.preventDefault();const t=$('chatInput').value.trim();if(!t||!room)return;
  try{await addDoc(collection(db,'rooms',room.id,'messages'),{text:t,userId:user.uid,username:handle(),createdAt:serverTimestamp()});$('chatInput').value=''}catch(err){toast(msg(err))}};
-$('backRooms').onclick=()=>{stop.chat?.();go('rooms')};
+$('backRooms').onclick=()=>{stop.chat?.();leaveRoomPresence();go('rooms')};
 $('roomTabs').onclick=e=>{const c=e.target.dataset.c;if(c){roomCat=c;renderRooms()}};
 
 
+/* ---------- Sohbet odalarında aktif üyeler ---------- */
+async function leaveRoomPresence(){
+ const old=activeRoomId;activeRoomId=null;clearInterval(presenceTimer);presenceTimer=null;
+ if(old&&user)try{await deleteDoc(doc(db,'rooms',old,'presence',user.uid))}catch(e){console.warn('Aktiflik silinemedi',e)}
+}
+function enterRoomPresence(id){
+ leaveRoomPresence();activeRoomId=id;
+ const ping=async()=>{if(activeRoomId!==id||!user)return;try{await setDoc(doc(db,'rooms',id,'presence',user.uid),{uid:user.uid,updatedAt:serverTimestamp()})}catch(e){console.warn('Aktiflik güncellenemedi',e)}};
+ ping();presenceTimer=setInterval(ping,30000);
+}
+function watchRoomPresence(){
+ roomPresenceStop?.();roomPresenceStop=null;
+ const ids=ROOMS.filter(r=>r.c===roomCat&&!r.duel).map(r=>r.id),unsubs=[];
+ ids.forEach(id=>unsubs.push(onSnapshot(collection(db,'rooms',id,'presence'),snap=>{
+  const now=Date.now();roomCounts.set(id,snap.docs.filter(d=>{const dt=d.data().updatedAt?.toMillis?.();return dt&&now-dt<PRESENCE_TTL}).length);
+  if(page==='rooms')drawRooms();
+ },e=>console.warn('Aktiflik bilgisi alınamadı',e))));
+ roomPresenceStop=()=>unsubs.forEach(f=>f());
+}
+function drawRooms(){document.querySelectorAll('#roomTabs button').forEach(b=>b.classList.toggle('active',b.dataset.c===roomCat));$('roomList').replaceChildren(...ROOMS.filter(r=>r.c===roomCat).map(roomEl))}
 /* ---------- Almanca Düello (iki oyunculu) ---------- */
 const DUEL_Q={
  A1:[
@@ -339,7 +359,7 @@ $('saveProfile').onclick=async()=>{const name=$('eName').value.trim(),username=$
 
 /* ---------- Yeni paylaşım ---------- */
 $('publish').onclick=async()=>{const text=$('postText').value.trim();if(!text)return;$('publish').disabled=true;$('postErr').textContent='';
- try{await addDoc(collection(db,'posts'),{text,topic:$('postTopic').value,userId:user.uid,username:handle(),likes:[],replyCount:0,createdAt:serverTimestamp()});
+ try{await addDoc(collection(db,'posts'),{text,topic:'genel',userId:user.uid,username:handle(),likes:[],replyCount:0,createdAt:serverTimestamp()});
   $('postText').value='';go('home');toast('Paylaşım yayınlandı')}catch(err){$('postErr').textContent=msg(err)}finally{$('publish').disabled=false}};
 
 /* ---------- Giriş / çıkış ---------- */
@@ -349,7 +369,7 @@ $('logout').onclick=async()=>{try{await signOut(auth);$('menu').hidden=true}catc
 $('menuBtn').onclick=()=>$('menu').hidden=!$('menu').hidden;
 $('meBtn').onclick=()=>openProfile(user.uid);
 $('fake').onclick=$('fakeBtn').onclick=()=>go('create');
-$('topicTabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;topic=t;document.querySelectorAll('#topicTabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));renderFeed()};
+
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
 
 onAuthStateChanged(auth,async u=>{
