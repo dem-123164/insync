@@ -2,7 +2,7 @@
 <html lang="tr"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>InSync · Birlikte keşfet</title>
+<title>InSync · Düello 1/3/5 dk</title>
 <style>
 :root{--bg:#fff;--fg:#111;--mut:#8a8a8a;--line:#ececec;--soft:#f5f5f5;--red:#e11d48;color-scheme:light dark}
 @media(prefers-color-scheme:dark){:root{--bg:#101010;--fg:#f3f3f3;--mut:#8f8f8f;--line:#262626;--soft:#1b1b1b}}
@@ -93,7 +93,7 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <section class="page" id="p-duel"><div class="sec">
   <button class="pill" id="duelBack">← Odalara dön</button>
   <h2 style="margin-top:18px">🇩🇪 InSync Duell</h2>
-  <p class="mut">İki kişi, 10 soru, Almanca bilgi yarışması.</p>
+  <p class="mut">İki kişi, 10 soru, Almanca bilgi yarışması. · Sürüm: 1-3-5 dakika</p>
   <div id="duelLobby"><label class="lbl" for="duelLevel">Seviye</label>
    <select id="duelLevel" class="field"><option>A1</option><option>A2</option><option>B1</option></select>
    <label class="lbl" for="duelSeconds">10 soru için toplam süre</label><select id="duelSeconds" class="field"><option value="60">1 dakika</option><option value="180" selected>3 dakika</option><option value="300">5 dakika</option></select><button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
@@ -289,7 +289,7 @@ const DUEL_Q={
 };
 let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0,duelClock=null,duelSaving=false;
 function openDuel(){go('duel');if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
-function duelReset(){clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
+function duelReset(){clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;duelSaveError='';$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
 $('duelBack').onclick=()=>go('rooms');
 $('duelLeave').onclick=()=>{duelReset();go('rooms')};
 $('duelFind').onclick=async()=>{
@@ -312,20 +312,21 @@ $('duelFind').onclick=async()=>{
  }catch(e){toast(msg(e));$('duelFind').disabled=false}finally{duelBusy=false}
 };
 const savedDuelAttempts=new Set();
+let duelSaveError='';
 async function saveDuelResult(id,points,level){
  if(!id||!user)return false;
  const key=user.uid+'_'+id;if(savedDuelAttempts.has(key))return true;
  try{
   await setDoc(doc(db,'users',user.uid,'duelResults',id),{points,language:'almanca',level,createdAt:serverTimestamp()});
-  savedDuelAttempts.add(key);return true;
- }catch(e){console.error('Düello puanı kaydedilemedi',e);toast('Puan kaydedilemedi: '+msg(e));return false}
+  savedDuelAttempts.add(key);duelSaveError='';return true;
+ }catch(e){console.error('Düello puanı kaydedilemedi',e);duelSaveError=msg(e);toast('Puan kaydedilemedi: '+duelSaveError);return false}
 }
 async function finishDuel(id,points,level){
  if(duelSaving||savedDuelAttempts.has(user.uid+'_'+id))return;
  duelSaving=true;
  const ok=await saveDuelResult(id,points,level);
  duelSaving=false;
- if(ok&&duelId===id){toast(points+' puan profiline kaydedildi');}
+ if(ok&&duelId===id){toast(points+' puan profiline kaydedildi');renderDuel();}else if(duelId===id){renderDuel();}
 }
 async function answerDuel(q,choice){
  if(duelBusy||!duelId||!user)return;
@@ -352,6 +353,7 @@ function renderDuel(){
   area.append(el('h3','',mine===other?'Berabere!':mine>other?'Kazandın! 🎉':'Rakibin kazandı!'));
   const status=el('p','',`${mine} puan · Profiline kaydediliyor…`);area.append(status);
   if(savedDuelAttempts.has(user.uid+'_'+duelId))status.textContent=`${mine} puan · Profiline kaydedildi ✓`;
+  else if(duelSaveError){status.textContent='Puan kaydedilemedi: '+duelSaveError;const retry=el('button','pill','Puanı tekrar kaydet');retry.onclick=()=>{duelSaveError='';finishDuel(duelId,mine,d.level)};area.append(retry)}
   else if(!duelSaving)finishDuel(duelId,mine,d.level);
   const b=el('button','pill pri','Tekrar oyna');b.onclick=()=>{duelReset();openDuel()};area.append(b);return;
  }
