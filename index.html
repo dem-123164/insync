@@ -54,12 +54,12 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <div id="loading" class="empty" style="padding:90px 20px">InSync yükleniyor…</div>
 
 <section id="auth" class="auth" hidden>
- <div style="border:1px solid var(--line);padding:18px;border-radius:16px;margin-bottom:24px">
+ <div style="border:1px solid var(--line);padding:18px;border-radius:16px;margin-bottom:24px" hidden>
  <h2>🇩🇪 Almanca Düello</h2><p>Üye olmadan, 2 dakikalık Almanca yarışmasına katıl!</p>
  <input class="field" id="guestName" maxlength="24" placeholder="Takma adın (ör. Deniz)" autocomplete="nickname">
  <button class="pill pri" id="guestStart" style="width:100%" type="button">⚔️ Misafir olarak başla</button>
  <p class="err" id="guestErr" role="alert"></p></div>
- <h1>InSync</h1><p class="mut">Dil, müzik ve edebiyat odalarında birlikte konuş.</p>
+ <button type="button" class="pill" id="accountBack">← Ana akışa dön</button><h1>InSync</h1><p class="mut">Dil, müzik ve edebiyat odalarında birlikte konuş.</p>
  <form id="authForm">
   <input class="field" id="email" type="email" autocomplete="email" placeholder="E-posta" required>
   <input class="field" id="password" type="password" autocomplete="current-password" placeholder="Şifre (en az 6 karakter)" minlength="6" required>
@@ -174,7 +174,7 @@ const msg=e=>ERR[e.code]||'Hata: '+(e.code||e.message);
 let user=null,me={},posts=[],topic='all',page='home',viewUid=null,threadId=null,room=null,roomCat='dil',stop={},tt;
 const users=new Map();
 const getUser=uid=>{if(!users.has(uid))users.set(uid,getDoc(doc(db,'users',uid)).then(s=>s.data()||{}).catch(()=>({})));return users.get(uid)};
-const handle=()=>user?.isAnonymous?(sessionStorage.getItem('insync_guest_name')||'Misafir'):(me.username||user?.email?.split('@')[0]||'Üye');
+const handle=()=>user?.isAnonymous?(sessionStorage.getItem('insync_guest_name')||'Ziyaretçi'):(me.username||user?.email?.split('@')[0]||'Üye');
 
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3500)}
 function ago(ts){const d=ts?.toDate?.();if(!d)return'şimdi';const s=(Date.now()-d)/1000;if(s<60)return'şimdi';if(s<3600)return Math.floor(s/60)+' dk';if(s<86400)return Math.floor(s/3600)+' sa';if(s<604800)return Math.floor(s/86400)+' gün';return d.toLocaleDateString('tr-TR')}
@@ -184,7 +184,7 @@ function paintMe(){['meAv','compAv'].forEach(id=>paint($(id),me,handle()))}
 function go(n){if(page==='chat'&&n!=='chat')leaveRoomPresence();page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
  const nav={chat:'rooms',duel:'rooms',thread:'home',edit:'profile'}[n]||n;
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===nav));scrollTo(0,0);
- if(n==='search')renderSearch();if(n==='rooms')renderRooms();if(n==='activity')renderActivity()}
+ if(user?.isAnonymous&&['search','activity','create','edit','profile'].includes(n)){showAccount();return}if(n==='search')renderSearch();if(n==='rooms')renderRooms();if(n==='activity')renderActivity()}
 
 /* ---------- Paylaşımlar ---------- */
 function postEl(p){
@@ -195,7 +195,7 @@ function postEl(p){
  if(p.topic&&p.topic!=='genel')h.append(el('span','chip',TOPICS[p.topic]||p.topic));
  const likes=p.likes||[],liked=likes.includes(user.uid),acts=el('div','acts');
  const lk=el('button',liked?'on':'',(liked?'♥ ':'♡ ')+(likes.length||'Beğen'));
- lk.onclick=async()=>{try{await updateDoc(doc(db,'posts',p.id),{likes:liked?arrayRemove(user.uid):arrayUnion(user.uid)});if(!liked&&p.userId!==user.uid)await notify(p.userId,'like',p.id)}catch(e){toast(msg(e))}};
+ lk.onclick=async()=>{if(user.isAnonymous)return showAccount();try{await updateDoc(doc(db,'posts',p.id),{likes:liked?arrayRemove(user.uid):arrayUnion(user.uid)});if(!liked&&p.userId!==user.uid)await notify(p.userId,'like',p.id)}catch(e){toast(msg(e))}};
  const rp=el('button','','◯ '+(p.replyCount?p.replyCount+' yanıt':'Yanıtla'));rp.onclick=()=>openThread(p.id);
  const sh=el('button','','↗ Paylaş');sh.onclick=async()=>{const url=location.origin+location.pathname+'#post-'+encodeURIComponent(p.id);try{await navigator.clipboard.writeText(url);toast('Bağlantı kopyalandı. İstediğin uygulamada paylaşabilirsin.')}catch(e){prompt('Paylaşım bağlantısını kopyala:',url)}};
  acts.append(lk,rp,sh);
@@ -225,7 +225,7 @@ $('backHome').onclick=()=>{stop.rep?.();go('home')};
 function roomEl(r){const i=el('div','room'),info=el('div','ri'),b=el('button','pill','Katıl');
  info.append(el('b','',r.n),el('br'),el('small','',r.d));const count=roomCounts.get(r.id)||0;if(!r.duel&&count)info.append(el('br'),el('span','online',count+' kişi aktif'));i.append(el('div','em',r.i),info,b);b.onclick=()=>r.duel?openDuel():openRoom(r);return i}
 function renderRooms(){watchRoomPresence();drawRooms()}
-function openRoom(r){room=r;stop.chat?.();enterRoomPresence(r.id);$('chatTitle').textContent=r.i+' '+r.n;$('chatDesc').textContent=r.d;
+function openRoom(r){if(user?.isAnonymous){toast('Sohbet için ücretsiz hesap oluşturabilirsin.');showAccount();return}room=r;stop.chat?.();enterRoomPresence(r.id);$('chatTitle').textContent=r.i+' '+r.n;$('chatDesc').textContent=r.d;
  $('messages').replaceChildren(el('p','empty','Mesajlar yükleniyor…'));go('chat');
  stop.chat=onSnapshot(query(collection(db,'rooms',r.id,'messages'),orderBy('createdAt','desc'),limit(100)),s=>{
   const list=s.docs.map(d=>d.data()).reverse(),box=$('messages');
@@ -317,8 +317,8 @@ let solo=null,soloClock=null;
 let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0,duelClock=null,duelSaving=false,inviteStop=null;
 function openDuel(){go('duel');if(solo){renderSolo();return}if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
 function duelReset(){solo=null;clearInterval(soloClock);soloClock=null;clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;duelSaveError='';$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
-$('duelBack').onclick=()=>user?.isAnonymous?toast('Misafir modunda yalnızca düello kullanılabilir.'):go('rooms');
-$('duelLeave').onclick=()=>{duelReset();go(user?.isAnonymous?'duel':'rooms')};
+$('duelBack').onclick=()=>go('rooms');
+$('duelLeave').onclick=()=>{duelReset();go('rooms')};
 function watchDuelInvites(){
  inviteStop?.();if(!user||user.isAnonymous)return;
  inviteStop=onSnapshot(query(collection(db,'duels'),where('guest','==',user.uid),where('status','==','invited'),limit(30)),snap=>{
@@ -349,7 +349,7 @@ async function sendDuelInvite(uid){
   attachDuel(ref.id);toast('Davet gönderildi. Rakibin kabul etmesini bekle.');
  }catch(e){toast(msg(e))}
 }
-$('duelFind').onclick=async()=>{
+$('duelFind').onclick=async()=>{if(user?.isAnonymous&&!sessionStorage.getItem('insync_guest_name')){const n=prompt('Düelloda görünecek takma adın nedir?','Ziyaretçi')?.trim();if(!n)return;sessionStorage.setItem('insync_guest_name',n.slice(0,24));me.name=handle();me.username=handle();paintMe()}
  if(duelBusy||duelId)return;duelBusy=true;$('duelFind').disabled=true;
  const level=$('duelLevel').value,seconds=120;
  try{
@@ -493,17 +493,19 @@ $('publish').onclick=async()=>{const text=$('postText').value.trim();if(!text)re
 $('authForm').onsubmit=async e=>{e.preventDefault();$('authErr').textContent='';try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authErr').textContent=msg(err)}};
 $('register').onclick=async()=>{$('authErr').textContent='';try{await createUserWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authErr').textContent=msg(err)}};
 $('logout').onclick=async()=>{try{await signOut(auth);$('menu').hidden=true}catch(err){toast(msg(err))}};
+function showAccount(){$('auth').hidden=false;$('app').hidden=true;document.querySelector('#auth > div').hidden=true;history.replaceState(null,'',location.pathname+'#hesap')}
+$('accountBack').onclick=()=>{$('auth').hidden=true;$('app').hidden=false;history.replaceState(null,'',location.pathname)};
 $('menuBtn').onclick=()=>$('menu').hidden=!$('menu').hidden;
-$('meBtn').onclick=()=>user?.isAnonymous?toast('Profil için normal üyelik gerekir.'):openProfile(user.uid);
-$('fake').onclick=$('fakeBtn').onclick=()=>go('create');
+$('meBtn').onclick=()=>user?.isAnonymous?showAccount():openProfile(user.uid);
+$('fake').onclick=$('fakeBtn').onclick=()=>user?.isAnonymous?showAccount():go('create');
 
-document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?(user?.isAnonymous?showAccount():openProfile(user.uid)):go(b.dataset.go));
 
 onAuthStateChanged(auth,async u=>{
  Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();inviteStop?.();duelReset();user=u;posts=[];
- $('loading').hidden=true;$('auth').hidden=!!u;$('app').hidden=!u;
- if(!u){users.clear();me={};$('password').value='';return}
- if(u.isAnonymous){me={username:handle(),name:handle()};$('app').hidden=false;document.querySelector('.bottom').hidden=true;$('menu').hidden=false;$('logout').textContent='Misafir oturumundan çık';$('duelInvites').textContent='Misafir modunda davet yok.';go('duel');return}
+ $('loading').hidden=true;$('auth').hidden=true;$('app').hidden=!u;
+ if(!u){users.clear();me={};$('password').value='';$('loading').hidden=false;$('loading').textContent='InSync açılıyor…';try{await signInAnonymously(auth)}catch(e){$('loading').textContent='Bağlantı kurulamadı: '+msg(e)}return}
+ if(u.isAnonymous){me={username:handle(),name:handle()};$('app').hidden=false;document.querySelector('.bottom').hidden=false;$('menu').hidden=true;$('logout').textContent='Oturumu kapat';$('duelInvites').textContent='Ziyaretçi modunda davet yok.';paintMe();go(location.hash==='#duel'?'duel':'home');startFeed();return}
  document.querySelector('.bottom').hidden=false;$('logout').textContent='Çıkış yap';
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
  try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
