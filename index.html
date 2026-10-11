@@ -75,13 +75,15 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
  <div class="brand">InSync</div>
  <button class="ib" id="meBtn" aria-label="Profilim"><span class="avatar sm" id="meAv"></span></button>
 </header>
-<div id="menu" hidden style="padding:12px 16px;border-bottom:1px solid var(--line)"><button class="pill" id="logout">Çıkış yap</button></div>
+<div id="menu" hidden style="padding:12px 16px;border-bottom:1px solid var(--line)"><button class="pill" id="logout">Çıkış yap</button> <button class="pill" id="adminLink" hidden>Yönetici paneli</button></div>
 
 <section class="page active" id="p-home">
  <div class="compose"><span class="avatar sm" id="compAv"></span><button class="fake" id="fake">Neler düşünüyorsun?</button><button class="pill" id="fakeBtn">Paylaş</button></div>
- <div id="feedStatus" class="empty">Paylaşımlar yükleniyor…</div><div id="feed"></div>
+ <div style="padding:14px 16px;border-bottom:1px solid var(--line)"><button class="pill pri" id="dailyShortcut">🏆 Günün Almanca yarışması · Hemen oyna</button></div><div id="feedStatus" class="empty">Paylaşımlar yükleniyor…</div><div id="feed"></div>
 </section>
 
+<section class="page" id="p-daily"><div class="sec"><h2>🇩🇪 Günün Almanca Yarışması</h2><p class="mut">Her gün yeni 10 soru · 2 dakika · Üyelik gerekmiyor</p><label class="lbl" for="dailyLevel">Seviye</label><select class="field" id="dailyLevel"><option>A1</option><option>A2</option><option>B1</option></select><div id="dailyGame"><button class="pill pri" id="dailyStart">Bugünün yarışmasına başla</button></div><h3>🏆 Günlük ilk 10</h3><div id="dailyBoard" class="mut">Sıralama yükleniyor…</div><button class="pill" id="dailySocial" style="margin-top:16px">Ana akışı keşfet →</button></div></section>
+<section class="page" id="p-admin"><div class="sec"><h2>InSync · Yönetici</h2><p class="mut">Yalnızca yetkili hesapla açılır.</p><div id="adminStats"></div><p class="mut">Ziyaretçi ve trafik kaynağı raporları Firebase Analytics / Google Analytics üzerinden görüntülenir. Bu panel gerçek zamanlı Analytics verisi taklidi yapmaz.</p><a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" class="pill" style="display:inline-block;text-decoration:none">Analytics raporlarını aç ↗</a></div></section>
 <section class="page" id="p-search"><div class="sec"><h2>Keşfet</h2>
  <input class="field" id="q" placeholder="Kullanıcı adı veya isim ara…"><div id="results"></div></div></section>
 
@@ -140,11 +142,16 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
+import{getAnalytics,isSupported,logEvent}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js';
 import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signInAnonymously,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
 import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment,where,runTransaction}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
 const app=initializeApp({apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'});
 const auth=getAuth(app),db=getFirestore(app);
+let analytics=null;isSupported().then(ok=>{if(ok)analytics=getAnalytics(app)}).catch(()=>{});
+function track(name,params={}){try{if(analytics)logEvent(analytics,name,params)}catch(e){console.warn('Analytics',e)}}
+// Güvenli yönetici yetkisi Firestore /admins/{uid} belgesi ve rules ile kontrol edilir.
+let isAdmin=false;
 // Instagram paylaşım bağlantısı: site adresi + #duel
 
 const TOPICS={genel:'Genel',dil:'Dil',muzik:'Müzik',edebiyat:'Edebiyat'};
@@ -184,7 +191,7 @@ function paintMe(){['meAv','compAv'].forEach(id=>paint($(id),me,handle()))}
 function go(n){if(page==='chat'&&n!=='chat')leaveRoomPresence();page=n;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='p-'+n));
  const nav={chat:'rooms',duel:'rooms',thread:'home',edit:'profile'}[n]||n;
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===nav));scrollTo(0,0);
- if(user?.isAnonymous&&['search','activity','create','edit','profile'].includes(n)){showAccount();return}if(n==='search')renderSearch();if(n==='rooms')renderRooms();if(n==='activity')renderActivity()}
+ if(user?.isAnonymous&&['search','activity','create','edit','profile'].includes(n)){showAccount();return}if(n==='daily')openDaily();if(n==='admin'&&!isAdmin){go('home');return}if(n==='admin')loadAdmin();if(n==='search')renderSearch();if(n==='rooms')renderRooms();if(n==='activity')renderActivity()}
 
 /* ---------- Paylaşımlar ---------- */
 function postEl(p){
@@ -436,6 +443,21 @@ function startSolo(){duelReset();const level=$('duelLevel').value,bank=DUEL_Q[le
 $('soloStart').onclick=startSolo;
 $('guestStart').onclick=async()=>{const name=$('guestName').value.trim();if(name.length<2){$('guestErr').textContent='En az 2 karakterli bir takma ad yaz.';return}sessionStorage.setItem('insync_guest_name',name);$('guestErr').textContent='';$('guestStart').disabled=true;try{await signInAnonymously(auth)}catch(e){$('guestErr').textContent='Misafir girişi açılamadı. Firebase Authentication içinde Anonymous yöntemini etkinleştir. '+msg(e)}finally{$('guestStart').disabled=false}};
 
+/* ---------- Günlük yarışma ve sıralama ---------- */
+let daily=null,dailyTimer=null,dailyUnsub=null;
+const dayKey=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+function dailyKey(){return dayKey()+'_'+$('dailyLevel').value}
+function openDaily(){watchDailyBoard()}
+function watchDailyBoard(){dailyUnsub?.();const key=dailyKey();$('dailyBoard').textContent='Sıralama yükleniyor…';dailyUnsub=onSnapshot(query(collection(db,'dailyBoards',key,'scores'),orderBy('points','desc'),limit(50)),snap=>{const rows=snap.docs.map(x=>x.data()).sort((a,b)=>(b.points||0)-(a.points||0)||(a.durationMs||Infinity)-(b.durationMs||Infinity)).slice(0,10);const box=$('dailyBoard');box.replaceChildren(...(rows.length?rows.map((r,i)=>{const line=el('div','score-row');line.append(el('span','',`${i+1}. ${r.name||'Yarışmacı'}`),el('b','',`${r.points||0} puan · ${Math.round((r.durationMs||0)/1000)} sn`));return line}):[el('p','mut','Bugün henüz sonuç yok. İlk sen ol!')]))},e=>$('dailyBoard').textContent='Sıralama alınamadı: '+msg(e))}
+$('dailyLevel').onchange=()=>{daily=null;clearInterval(dailyTimer);$('dailyGame').replaceChildren();const b=el('button','pill pri','Bugünün yarışmasına başla');b.onclick=startDaily;$('dailyGame').append(b);watchDailyBoard()};
+$('dailyShortcut').onclick=()=>go('daily');$('dailySocial').onclick=()=>go('home');
+$('dailyStart').onclick=startDaily;
+function startDaily(){if(!user)return;clearInterval(dailyTimer);const level=$('dailyLevel').value,key=dailyKey(),indices=duelQuestionIndices('daily:'+key,level);daily={level,key,questions:indices.map(i=>DUEL_Q[level][i]),index:0,score:0,started:Date.now(),end:Date.now()+120000,finished:false};track('daily_quiz_start',{level});renderDaily();dailyTimer=setInterval(renderDaily,500)}
+function renderDaily(){if(!daily||page!=='daily')return;const g=$('dailyGame'),d=daily;g.replaceChildren();const left=Math.max(0,Math.ceil((d.end-Date.now())/1000));if(left===0||d.index===10){clearInterval(dailyTimer);g.append(el('h3','',`Yarışma tamamlandı: ${d.score} puan`));if(!d.finished){d.finished=true;saveDaily(d)}const again=el('button','pill','Tekrar oyna');again.onclick=startDaily;const social=el('button','pill pri','Ana akışa geç →');social.style.marginLeft='8px';social.onclick=()=>go('home');const rooms=el('button','pill','Sohbet odaları');rooms.style.marginLeft='8px';rooms.onclick=()=>go('rooms');g.append(again,social,rooms);return}
+ g.append(el('p','mut',`Soru ${d.index+1}/10 · ⏱ ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')} · ${d.score} puan`),el('h3','',d.questions[d.index][0]));d.questions[d.index][1].forEach((a,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${a}`);b.onclick=()=>{if(!daily||daily!==d||Date.now()>=d.end)return;if(i===d.questions[d.index][2])d.score+=10;d.index++;renderDaily()};g.append(b)})}
+async function saveDaily(d){track('daily_quiz_finish',{level:d.level,score:d.score});let name=handle();if(user.isAnonymous){name=sessionStorage.getItem('insync_daily_name')||prompt('Sıralamada hangi takma ad görünsün?','Ziyaretçi')?.trim()||'Ziyaretçi';sessionStorage.setItem('insync_daily_name',name.slice(0,24))}const durationMs=Math.min(120000,Date.now()-d.started);try{const id=user.uid;const ref=doc(db,'dailyBoards',d.key,'scores',id);const old=await getDoc(ref);if(!old.exists()||d.score>old.data().points||(d.score===old.data().points&&durationMs<old.data().durationMs)){await setDoc(ref,{uid:id,name:name.slice(0,24),points:d.score,durationMs,level:d.level,day:dayKey(),createdAt:serverTimestamp()})}}catch(e){toast('Sıralama kaydedilemedi: '+msg(e))}}
+async function loadAdmin(){if(!isAdmin)return;const box=$('adminStats');box.textContent='Üye sayısı yükleniyor…';try{const snap=await getDocs(collection(db,'users'));box.replaceChildren(el('h3','',`Kayıtlı profil: ${snap.size}`),el('p','mut','Bu sayı Firestore kullanıcı profillerini gösterir; anonim ziyaretçiler dahil değildir.'))}catch(e){box.textContent=msg(e)}}
+$('adminLink').onclick=()=>go('admin');
 /* ---------- Keşfet, takip ve hareketler ---------- */
 let directory=[],following=new Set(),followUnsub=null,activityUnsub=null;
 const profileLabel=u=>u.name||u.username||'InSync üyesi';
@@ -502,12 +524,12 @@ $('fake').onclick=$('fakeBtn').onclick=()=>user?.isAnonymous?showAccount():go('c
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?(user?.isAnonymous?showAccount():openProfile(user.uid)):go(b.dataset.go));
 
 onAuthStateChanged(auth,async u=>{
- Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();inviteStop?.();duelReset();user=u;posts=[];
+ Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();inviteStop?.();duelReset();user=u;posts=[];isAdmin=false;dailyUnsub?.();clearInterval(dailyTimer);track('session_start');
  $('loading').hidden=true;$('auth').hidden=true;$('app').hidden=!u;
  if(!u){users.clear();me={};$('password').value='';$('loading').hidden=false;$('loading').textContent='InSync açılıyor…';try{await signInAnonymously(auth)}catch(e){$('loading').textContent='Bağlantı kurulamadı: '+msg(e)}return}
- if(u.isAnonymous){me={username:handle(),name:handle()};$('app').hidden=false;document.querySelector('.bottom').hidden=false;$('menu').hidden=true;$('logout').textContent='Oturumu kapat';$('duelInvites').textContent='Ziyaretçi modunda davet yok.';paintMe();go(location.hash==='#duel'?'duel':'home');startFeed();return}
+ if(u.isAnonymous){isAdmin=false;$('adminLink').hidden=true;me={username:handle(),name:handle()};$('app').hidden=false;document.querySelector('.bottom').hidden=false;$('menu').hidden=true;$('logout').textContent='Oturumu kapat';$('duelInvites').textContent='Ziyaretçi modunda davet yok.';paintMe();go(location.hash==='#duel'?'duel':'home');startFeed();return}
  document.querySelector('.bottom').hidden=false;$('logout').textContent='Çıkış yap';
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
  try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
- users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing();watchDuelInvites();if(location.hash==='#duel')openDuel()});
+ try{isAdmin=(await getDoc(doc(db,'admins',u.uid))).exists()}catch(e){isAdmin=false} $('adminLink').hidden=!isAdmin;users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing();watchDuelInvites();if(location.hash==='#duel')openDuel()});
 </script></body></html>
