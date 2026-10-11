@@ -54,6 +54,11 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <div id="loading" class="empty" style="padding:90px 20px">InSync yükleniyor…</div>
 
 <section id="auth" class="auth" hidden>
+ <div style="border:1px solid var(--line);padding:18px;border-radius:16px;margin-bottom:24px">
+ <h2>🇩🇪 Almanca Düello</h2><p>Üye olmadan, 2 dakikalık Almanca yarışmasına katıl!</p>
+ <input class="field" id="guestName" maxlength="24" placeholder="Takma adın (ör. Deniz)" autocomplete="nickname">
+ <button class="pill pri" id="guestStart" style="width:100%" type="button">⚔️ Misafir olarak başla</button>
+ <p class="err" id="guestErr" role="alert"></p></div>
  <h1>InSync</h1><p class="mut">Dil, müzik ve edebiyat odalarında birlikte konuş.</p>
  <form id="authForm">
   <input class="field" id="email" type="email" autocomplete="email" placeholder="E-posta" required>
@@ -93,10 +98,10 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 <section class="page" id="p-duel"><div class="sec">
   <button class="pill" id="duelBack">← Odalara dön</button>
   <h2 style="margin-top:18px">🇩🇪 InSync Duell</h2>
-  <p class="mut">İki kişi, her düelloda rastgele 10 soru. · 1 / 3 / 5 dakika</p>
+  <p class="mut">10 soru · Her yarışma 2 dakika</p>
   <div id="duelLobby"><h3>Gelen düello davetleri</h3><div id="duelInvites" class="mut">Davetler yükleniyor…</div><label class="lbl" for="duelLevel">Seviye</label>
    <select id="duelLevel" class="field"><option>A1</option><option>A2</option><option>B1</option></select>
-   <label class="lbl" for="duelSeconds">10 soru için toplam süre</label><select id="duelSeconds" class="field"><option value="60">1 dakika</option><option value="180" selected>3 dakika</option><option value="300">5 dakika</option></select><button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
+   <p class="mut">⏱ Süre: 2 dakika</p><button class="pill" id="soloStart" style="margin:8px 8px 8px 0">Tek başıma yarış</button><button class="pill pri" id="duelFind">Rakip bul / Düello başlat</button></div>
   <div id="duelGame" hidden><div id="duelStatus" class="mut"></div>
    <div id="duelScores" class="duel-score"></div><div id="duelQuestion"></div>
    <button class="pill" id="duelLeave" style="margin-top:18px">Odadan çık</button></div>
@@ -135,11 +140,12 @@ textarea.field{resize:vertical}.lbl{display:block;font-size:13px;font-weight:700
 
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
-import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signInAnonymously,signOut}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
 import{getFirestore,collection,addDoc,serverTimestamp,onSnapshot,query,orderBy,limit,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,arrayUnion,arrayRemove,increment,where,runTransaction}from'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
 const app=initializeApp({apiKey:'AIzaSyC8EA2eeb_6sF9pXta2J_QgAYjzb1JdH0E',authDomain:'insync-d44db.firebaseapp.com',projectId:'insync-d44db',storageBucket:'insync-d44db.firebasestorage.app',messagingSenderId:'984274373406',appId:'1:984274373406:web:321982f96496be816e170f',measurementId:'G-GTK1H0TEN2'});
 const auth=getAuth(app),db=getFirestore(app);
+// Instagram paylaşım bağlantısı: site adresi + #duel
 
 const TOPICS={genel:'Genel',dil:'Dil',muzik:'Müzik',edebiyat:'Edebiyat'};
 const PRESENCE_TTL=90000;let activeRoomId=null,presenceTimer=null,presenceStop=null,roomPresenceStop=null;const roomCounts=new Map();
@@ -168,7 +174,7 @@ const msg=e=>ERR[e.code]||'Hata: '+(e.code||e.message);
 let user=null,me={},posts=[],topic='all',page='home',viewUid=null,threadId=null,room=null,roomCat='dil',stop={},tt;
 const users=new Map();
 const getUser=uid=>{if(!users.has(uid))users.set(uid,getDoc(doc(db,'users',uid)).then(s=>s.data()||{}).catch(()=>({})));return users.get(uid)};
-const handle=()=>me.username||user.email.split('@')[0];
+const handle=()=>user?.isAnonymous?(sessionStorage.getItem('insync_guest_name')||'Misafir'):(me.username||user?.email?.split('@')[0]||'Üye');
 
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3500)}
 function ago(ts){const d=ts?.toDate?.();if(!d)return'şimdi';const s=(Date.now()-d)/1000;if(s<60)return'şimdi';if(s<3600)return Math.floor(s/60)+' dk';if(s<86400)return Math.floor(s/3600)+' sa';if(s<604800)return Math.floor(s/86400)+' gün';return d.toLocaleDateString('tr-TR')}
@@ -307,13 +313,14 @@ function duelQuestionIndices(id,level){
  return arr.slice(0,10);
 }
 
+let solo=null,soloClock=null;
 let duelId=null,duelState=null,duelAnswers=[],duelStop=null,duelAnswerStop=null,duelBusy=false,duelSince=0,duelClock=null,duelSaving=false,inviteStop=null;
-function openDuel(){go('duel');if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
-function duelReset(){clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;duelSaveError='';$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
-$('duelBack').onclick=()=>go('rooms');
-$('duelLeave').onclick=()=>{duelReset();go('rooms')};
+function openDuel(){go('duel');if(solo){renderSolo();return}if(duelId){$('duelLobby').hidden=true;$('duelGame').hidden=false;renderDuel()}}
+function duelReset(){solo=null;clearInterval(soloClock);soloClock=null;clearInterval(duelClock);duelClock=null;duelStop?.();duelAnswerStop?.();duelStop=null;duelAnswerStop=null;duelId=null;duelState=null;duelAnswers=[];duelBusy=false;duelSaving=false;duelSaveError='';$('duelLobby').hidden=false;$('duelGame').hidden=true;$('duelFind').disabled=false}
+$('duelBack').onclick=()=>user?.isAnonymous?toast('Misafir modunda yalnızca düello kullanılabilir.'):go('rooms');
+$('duelLeave').onclick=()=>{duelReset();go(user?.isAnonymous?'duel':'rooms')};
 function watchDuelInvites(){
- inviteStop?.();if(!user)return;
+ inviteStop?.();if(!user||user.isAnonymous)return;
  inviteStop=onSnapshot(query(collection(db,'duels'),where('guest','==',user.uid),where('status','==','invited'),limit(30)),snap=>{
   const box=$('duelInvites');box.replaceChildren();
   if(snap.empty){box.append(el('p','mut','Şu anda bekleyen davetin yok.'));return}
@@ -338,13 +345,13 @@ async function sendDuelInvite(uid){
  if(duelId)return toast('Önce mevcut düellodan çık.');
  const level=prompt('Düello seviyesi: A1, A2 veya B1','A1')?.trim().toUpperCase();
  if(!level)return;if(!DUEL_Q[level])return toast('A1, A2 veya B1 seç.');
- try{const ref=await addDoc(collection(db,'duels'),{level,seconds:180,host:user.uid,hostName:handle(),guest:uid,guestName:'',status:'invited',createdAt:serverTimestamp()});
+ try{const ref=await addDoc(collection(db,'duels'),{level,seconds:120,host:user.uid,hostName:handle(),guest:uid,guestName:'',status:'invited',createdAt:serverTimestamp()});
   attachDuel(ref.id);toast('Davet gönderildi. Rakibin kabul etmesini bekle.');
  }catch(e){toast(msg(e))}
 }
 $('duelFind').onclick=async()=>{
  if(duelBusy||duelId)return;duelBusy=true;$('duelFind').disabled=true;
- const level=$('duelLevel').value,seconds=Number($('duelSeconds').value);
+ const level=$('duelLevel').value,seconds=120;
  try{
   const waiting=await getDocs(query(collection(db,'duels'),where('status','==','waiting'),limit(100)));
   let joined=null;
@@ -362,7 +369,7 @@ $('duelFind').onclick=async()=>{
 const savedDuelAttempts=new Set();
 let duelSaveError='';
 async function saveDuelResult(id,points,level){
- if(!id||!user)return false;
+ if(!id||!user)return false;if(user.isAnonymous)return true;
  const key=user.uid+'_'+id;if(savedDuelAttempts.has(key))return true;
  try{
   await setDoc(doc(db,'users',user.uid,'duelResults',id),{points,language:'almanca',level,createdAt:serverTimestamp()});
@@ -374,7 +381,7 @@ async function finishDuel(id,points,level){
  duelSaving=true;
  const ok=await saveDuelResult(id,points,level);
  duelSaving=false;
- if(ok&&duelId===id){toast(points+' puan profiline kaydedildi');renderDuel();}else if(duelId===id){renderDuel();}
+ if(ok&&duelId===id){if(!user.isAnonymous)toast(points+' puan profiline kaydedildi');renderDuel();}else if(duelId===id){renderDuel();}
 }
 async function answerDuel(q,choice){
  if(duelBusy||!duelId||!user)return;
@@ -393,8 +400,8 @@ function renderDuel(){
  const area=$('duelQuestion');area.replaceChildren();
  if(d.status==='declined'){ $('duelStatus').textContent='Davet reddedildi.';area.append(el('p','mut','Yeni bir rakip seçebilirsin.'));return}
  if(d.status==='invited'){ $('duelStatus').textContent='Davet gönderildi, yanıt bekleniyor…';area.append(el('p','mut','Rakibin daveti kabul ettiğinde yarışma başlayacak.'));return}
- if(d.status==='waiting'||!d.guest){$('duelStatus').textContent=`Rakip bekleniyor… ${Math.round((d.seconds||180)/60)} dakikalık düello. Diğer oyuncu aynı seviyeyi seçerek katılabilir.`;area.append(el('p','mut','Oyun rakip katılınca başlar.'));return}
- const seconds=[60,180,300].includes(Number(d.seconds))?Number(d.seconds):180;
+ if(d.status==='waiting'||!d.guest){$('duelStatus').textContent=`Rakip bekleniyor… ${2} dakikalık düello. Diğer oyuncu aynı seviyeyi seçerek katılabilir.`;area.append(el('p','mut','Oyun rakip katılınca başlar.'));return}
+ const seconds=120;
  const started=Number(d.startedAt)||Date.now();
  const remaining=Math.max(0,Math.ceil((started+seconds*1000-Date.now())/1000));
  const next=Array.from({length:10},(_,i)=>i).find(i=>!my.some(a=>a.q===i));
@@ -402,10 +409,10 @@ function renderDuel(){
   const mine=score(user.uid),other=score(d.host===user.uid?d.guest:d.host);
   $('duelStatus').textContent='Düello tamamlandı!';
   area.append(el('h3','',mine===other?'Berabere!':mine>other?'Kazandın! 🎉':'Rakibin kazandı!'));
-  const status=el('p','',`${mine} puan · Profiline kaydediliyor…`);area.append(status);
-  if(savedDuelAttempts.has(user.uid+'_'+duelId))status.textContent=`${mine} puan · Profiline kaydedildi ✓`;
+  const status=el('p','',user.isAnonymous?`${mine} puan · Misafir puanları kalıcı kaydedilmez`:`${mine} puan · Profiline kaydediliyor…`);area.append(status);
+  if(!user.isAnonymous&&savedDuelAttempts.has(user.uid+'_'+duelId))status.textContent=`${mine} puan · Profiline kaydedildi ✓`;
   else if(duelSaveError){status.textContent='Puan kaydedilemedi: '+duelSaveError;const retry=el('button','pill','Puanı tekrar kaydet');retry.onclick=()=>{duelSaveError='';finishDuel(duelId,mine,d.level)};area.append(retry)}
-  else if(!duelSaving)finishDuel(duelId,mine,d.level);
+  else if(!duelSaving&&!user.isAnonymous)finishDuel(duelId,mine,d.level);
   const b=el('button','pill pri','Tekrar oyna');b.onclick=()=>{duelReset();openDuel()};area.append(b);return;
  }
  const min=Math.floor(remaining/60),sec=String(remaining%60).padStart(2,'0');
@@ -413,6 +420,21 @@ function renderDuel(){
  const q=qs[next];area.append(el('h3','',q[0]));
  q[1].forEach((choice,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${choice}`);b.onclick=()=>{if(duelBusy||Date.now()>=started+seconds*1000)return;area.querySelectorAll('button').forEach(x=>x.disabled=true);answerDuel(next,i)};area.append(b)});
 }
+
+
+function renderSolo(){
+ if(!solo)return;
+ $('duelLobby').hidden=true;$('duelGame').hidden=false;
+ const left=Math.max(0,Math.ceil((solo.end-Date.now())/1000)),area=$('duelQuestion');area.replaceChildren();
+ $('duelScores').textContent=handle()+': '+solo.score+' puan';
+ if(left===0||solo.index>=10){clearInterval(soloClock);$('duelStatus').textContent='Yarışma tamamlandı!';area.append(el('h3','',solo.score+' puan kazandın!'));const b=el('button','pill pri','Tekrar oyna');b.onclick=startSolo;area.append(b);return}
+ $('duelStatus').textContent=`${solo.level} · Soru ${solo.index+1}/10 · ⏱ ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;
+ const q=solo.questions[solo.index];area.append(el('h3','',q[0]));
+ q[1].forEach((answer,i)=>{const b=el('button','duel-option',`${String.fromCharCode(65+i)}) ${answer}`);b.onclick=()=>{if(!solo||Date.now()>=solo.end)return;if(i===q[2])solo.score+=10;solo.index++;renderSolo()};area.append(b)});
+}
+function startSolo(){duelReset();const level=$('duelLevel').value,bank=DUEL_Q[level];const ids=Array.from({length:bank.length},(_,i)=>i);for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}solo={level,questions:ids.slice(0,10).map(i=>bank[i]),index:0,score:0,end:Date.now()+120000};go('duel');renderSolo();soloClock=setInterval(renderSolo,500)}
+$('soloStart').onclick=startSolo;
+$('guestStart').onclick=async()=>{const name=$('guestName').value.trim();if(name.length<2){$('guestErr').textContent='En az 2 karakterli bir takma ad yaz.';return}sessionStorage.setItem('insync_guest_name',name);$('guestErr').textContent='';$('guestStart').disabled=true;try{await signInAnonymously(auth)}catch(e){$('guestErr').textContent='Misafir girişi açılamadı. Firebase Authentication içinde Anonymous yöntemini etkinleştir. '+msg(e)}finally{$('guestStart').disabled=false}};
 
 /* ---------- Keşfet, takip ve hareketler ---------- */
 let directory=[],following=new Set(),followUnsub=null,activityUnsub=null;
@@ -472,7 +494,7 @@ $('authForm').onsubmit=async e=>{e.preventDefault();$('authErr').textContent='';
 $('register').onclick=async()=>{$('authErr').textContent='';try{await createUserWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(err){$('authErr').textContent=msg(err)}};
 $('logout').onclick=async()=>{try{await signOut(auth);$('menu').hidden=true}catch(err){toast(msg(err))}};
 $('menuBtn').onclick=()=>$('menu').hidden=!$('menu').hidden;
-$('meBtn').onclick=()=>openProfile(user.uid);
+$('meBtn').onclick=()=>user?.isAnonymous?toast('Profil için normal üyelik gerekir.'):openProfile(user.uid);
 $('fake').onclick=$('fakeBtn').onclick=()=>go('create');
 
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='profile'?openProfile(user.uid):go(b.dataset.go));
@@ -481,7 +503,9 @@ onAuthStateChanged(auth,async u=>{
  Object.values(stop).forEach(f=>f?.());stop={};followUnsub?.();activityUnsub?.();inviteStop?.();duelReset();user=u;posts=[];
  $('loading').hidden=true;$('auth').hidden=!!u;$('app').hidden=!u;
  if(!u){users.clear();me={};$('password').value='';return}
+ if(u.isAnonymous){me={username:handle(),name:handle()};$('app').hidden=false;document.querySelector('.bottom').hidden=true;$('menu').hidden=false;$('logout').textContent='Misafir oturumundan çık';$('duelInvites').textContent='Misafir modunda davet yok.';go('duel');return}
+ document.querySelector('.bottom').hidden=false;$('logout').textContent='Çıkış yap';
  const ref=doc(db,'users',u.uid),nm=u.email.split('@')[0];
  try{const s=await getDoc(ref);if(s.exists())me=s.data();else{me={username:nm,name:nm,bio:''};await setDoc(ref,me)}}catch{me={username:nm,name:nm}}
- users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing();watchDuelInvites()});
+ users.set(u.uid,Promise.resolve(me));paintMe();go('home');startFeed();startDirectory();watchFollowing();watchDuelInvites();if(location.hash==='#duel')openDuel()});
 </script></body></html>
